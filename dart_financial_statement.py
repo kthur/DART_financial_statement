@@ -15,6 +15,7 @@ import yfinance as yf
 import pandas_datareader
 import numpy as np
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 # Scrape value
 def find_value(text, unit):
@@ -1341,23 +1342,26 @@ def main():
 	balance_sheet_list = []
 	income_statement_list = []
 	
-	year = 2017
+	current_time = datetime.now()
+	year = current_time.year
 	start_day = datetime(2005,1,1)
-	#start_day = datetime(2000,1,1)
-	#end_day = datetime(2002,11,15)
 	end_day = datetime(2017,11,15)
+	end_day = datetime(current_time.year,current_time.month,current_time.day)
 	delta = end_day - start_day
 
-	# 사업보고서
-	report = "%EC%82%AC%EC%97%85%EB%B3%B4%EA%B3%A0%EC%84%9C"
-	# 분기보고서
-	report2 = "%EB%B6%84%EA%B8%B0%EB%B3%B4%EA%B3%A0%EC%84%9C" 
 	start_day2 = datetime(2017,10,15)
-	end_day2 = datetime(2017,11,17)
+	end_day2 = datetime(current_time.year,current_time.month,current_time.day)
+	# http://coderstoolbox.net/string/#!encoding=url&action=encode&charset=utf_8
+	# 사업보고서
+	report_year = "%EC%82%AC%EC%97%85%EB%B3%B4%EA%B3%A0%EC%84%9C"
+	# 반기보고서
+	report_half = "%EB%B0%98%EA%B8%B0%EB%B3%B4%EA%B3%A0%EC%84%9C"
+	# 분기보고서
+	report_quarter = "%EB%B6%84%EA%B8%B0%EB%B3%B4%EA%B3%A0%EC%84%9C" 
 
 
 	# 최신 분기보고서 읽기
-	handle = urllib.request.urlopen(url_templete % (report2, urllib.parse.quote(corp), start_day2.strftime('%Y%m%d'), end_day2.strftime('%Y%m%d')))
+	handle = urllib.request.urlopen(url_templete % (report_quarter, urllib.parse.quote(corp), start_day2.strftime('%Y%m%d'), end_day2.strftime('%Y%m%d')))
 
 	data = handle.read()
 	soup = BeautifulSoup(data, 'html.parser', from_encoding='utf-8')
@@ -1664,8 +1668,8 @@ def main():
 
 	#handle = urllib.request.urlopen(url_templete % (report, urllib.parse.quote(corp)))
 	#print("URL" + url_templete % (report, corp))
-	handle = urllib.request.urlopen(url_templete % (report, urllib.parse.quote(corp), start_day.strftime('%Y%m%d'), end_day.strftime('%Y%m%d')))
-	print("URL" + url_templete % (report, corp, start_day.strftime('%Y%m%d'), end_day.strftime('%Y%m%d')))
+	handle = urllib.request.urlopen(url_templete % (report_year, urllib.parse.quote(corp), start_day.strftime('%Y%m%d'), end_day.strftime('%Y%m%d')))
+	print("URL" + url_templete % (report_year, corp, start_day.strftime('%Y%m%d'), end_day.strftime('%Y%m%d')))
 
 	data = handle.read()
 	soup = BeautifulSoup(data, 'html.parser', from_encoding='utf-8')
