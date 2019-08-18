@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 import re
 import xlrd
-import fix_yahoo_finance as yf
+import yfinance as yf
 import pandas_datareader
 import numpy as np
 import matplotlib.pyplot as plt
