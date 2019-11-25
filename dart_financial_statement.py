@@ -7,7 +7,6 @@ import os
 import time
 import sys
 import getopt
-from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 import re
 import xlrd
@@ -1344,16 +1343,9 @@ def main():
 	balance_sheet_list = []
 	income_statement_list = []
 
-	current_time = datetime.now()
-	year = current_time.year
+	year = datetime.today().year
 	start_day = datetime(2005,1,1)
-	end_day = datetime(current_time.year,current_time.month,current_time.day)
-	delta = end_day - start_day
-
-
-	# 최근 보고서 검색
-	start_day2 = datetime.today() - timedelta(days=90)
-	end_day2 = datetime.today()
+	end_day = datetime.today()
 
 	# http://coderstoolbox.net/string/#!encoding=url&action=encode&charset=utf_8
 	# 사업보고서
@@ -1363,12 +1355,9 @@ def main():
 	# 분기보고서
 	report_quarter = "%EB%B6%84%EA%B8%B0%EB%B3%B4%EA%B3%A0%EC%84%9C" 
 
-
 	# 최신 분기보고서 읽기
-	handle = urllib.request.urlopen(url_templete % (report_year, urllib.parse.quote(corp), start_day2.strftime('%Y%m%d'), end_day2.strftime('%Y%m%d')))
-	print(url_templete % (report_year, urllib.parse.quote(corp), start_day2.strftime('%Y%m%d'), end_day2.strftime('%Y%m%d')))
-
-
+	handle = urllib.request.urlopen(url_templete % (report_year, urllib.parse.quote(corp), (datetime.today() - timedelta(days=90)).strftime('%Y%m%d'), datetime.today().strftime('%Y%m%d')))
+#	print(url_templete % (report_year, urllib.parse.quote(corp), start_day2.strftime('%Y%m%d'), end_day2.strftime('%Y%m%d')))
 
 	data = handle.read()
 	soup = BeautifulSoup(data, 'html.parser', from_encoding='utf-8')
@@ -1685,9 +1674,7 @@ def main():
 	trs = table.findAll('tr')
 	tds = table.findAll('td')
 	counts = len(tds)
-	#print(counts)
 
-	#if counts > 0:
 	if counts > 2:
 		# Delay operation
 		time.sleep(20)
@@ -2051,5 +2038,3 @@ def main():
 # Main
 if __name__ == "__main__":
 	main()
-
-
