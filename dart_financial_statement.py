@@ -79,17 +79,12 @@ def write_excel_file(workbook_name, dart_post_list, cashflow_list, balance_sheet
 	workbook = xlsxwriter.Workbook(workbook_name)
 
 	worksheet_result = workbook.add_worksheet('DART사업보고서')
-	filter_format = workbook.add_format({'bold':True,
-										'fg_color': '#D7E4BC'
-										})
-	filter_format2 = workbook.add_format({'bold':True
-										})
+	filter_format_color = workbook.add_format({'bold':True, 'fg_color': '#D7E4BC'})
+	filter_format = workbook.add_format({'bold':True})
 
 	percent_format = workbook.add_format({'num_format': '0.00%'})
 
-	roe_format = workbook.add_format({'bold':True,
-									  'underline': True,
-									  'num_format': '0.00%'})
+	roe_format = workbook.add_format({'bold':True, 'underline': True, 'num_format': '0.00%'})
 
 	num_format = workbook.add_format({'num_format':'0.00'})
 	num2_format = workbook.add_format({'num_format':'#,##0'})
@@ -105,40 +100,40 @@ def write_excel_file(workbook_name, dart_post_list, cashflow_list, balance_sheet
 	worksheet_result.set_column('J:J', 15)
 	worksheet_result.set_column('K:K', 15)
 
-	worksheet_result.write(0, 0, "날짜", filter_format)
-	worksheet_result.write(0, 1, "회사명", filter_format)
-	worksheet_result.write(0, 2, "분류", filter_format)
-	worksheet_result.write(0, 3, "제목", filter_format)
-	worksheet_result.write(0, 4, "link", filter_format)
-	worksheet_result.write(0, 5, "결산년도", filter_format)
-	worksheet_result.write(0, 6, "영업활동 현금흐름", filter_format)
-	worksheet_result.write(0, 7, "영업에서 창출된 현금흐름", filter_format)
-	worksheet_result.write(0, 8, "당기순이익", filter_format)
-	worksheet_result.write(0, 9, "투자활동 현금흐름", filter_format)
-	worksheet_result.write(0, 10, "유형자산의 취득", filter_format)
-	worksheet_result.write(0, 11, "무형자산의 취득", filter_format)
-	worksheet_result.write(0, 12, "토지의 취득", filter_format)
-	worksheet_result.write(0, 13, "건물의 취득", filter_format)
-	worksheet_result.write(0, 14, "구축물의 취득", filter_format)
-	worksheet_result.write(0, 15, "기계장치의 취득", filter_format)
-	worksheet_result.write(0, 16, "건설중인자산의 증가", filter_format)
-	worksheet_result.write(0, 17, "차량운반구의 취득", filter_format)
-	worksheet_result.write(0, 18, "비품의 취득", filter_format)
-	worksheet_result.write(0, 19, "공구기구의 취득", filter_format)
-	worksheet_result.write(0, 20, "시험 연구 설비의 취득", filter_format)
-	worksheet_result.write(0, 21, "렌탈 자산의 취득", filter_format)
-	worksheet_result.write(0, 22, "영업권의 취득", filter_format)
-	worksheet_result.write(0, 23, "산업재산권의 취득", filter_format)
-	worksheet_result.write(0, 24, "소프트웨어의 취득", filter_format)
-	worksheet_result.write(0, 25, "기타의무형자산의 취득", filter_format)
-	worksheet_result.write(0, 26, "투자부동산의 취득", filter_format)
-	worksheet_result.write(0, 27, "관계기업투자의 취득", filter_format)
-	worksheet_result.write(0, 28, "재무활동 현금흐름", filter_format)
-	worksheet_result.write(0, 29, "단기차입금의 증가", filter_format)
-	worksheet_result.write(0, 30, "배당금 지급", filter_format)
-	worksheet_result.write(0, 31, "자기주식의 취득", filter_format)
-	worksheet_result.write(0, 32, "기초현금 및 현금성자산", filter_format)
-	worksheet_result.write(0, 33, "기말현금 및 현금성자산", filter_format)
+	worksheet_result.write(0, 0, "날짜", filter_format_color)
+	worksheet_result.write(0, 1, "회사명", filter_format_color)
+	worksheet_result.write(0, 2, "분류", filter_format_color)
+	worksheet_result.write(0, 3, "제목", filter_format_color)
+	worksheet_result.write(0, 4, "link", filter_format_color)
+	worksheet_result.write(0, 5, "결산년도", filter_format_color)
+	worksheet_result.write(0, 6, "영업활동 현금흐름", filter_format_color)
+	worksheet_result.write(0, 7, "영업에서 창출된 현금흐름", filter_format_color)
+	worksheet_result.write(0, 8, "당기순이익", filter_format_color)
+	worksheet_result.write(0, 9, "투자활동 현금흐름", filter_format_color)
+	worksheet_result.write(0, 10, "유형자산의 취득", filter_format_color)
+	worksheet_result.write(0, 11, "무형자산의 취득", filter_format_color)
+	worksheet_result.write(0, 12, "토지의 취득", filter_format_color)
+	worksheet_result.write(0, 13, "건물의 취득", filter_format_color)
+	worksheet_result.write(0, 14, "구축물의 취득", filter_format_color)
+	worksheet_result.write(0, 15, "기계장치의 취득", filter_format_color)
+	worksheet_result.write(0, 16, "건설중인자산의 증가", filter_format_color)
+	worksheet_result.write(0, 17, "차량운반구의 취득", filter_format_color)
+	worksheet_result.write(0, 18, "비품의 취득", filter_format_color)
+	worksheet_result.write(0, 19, "공구기구의 취득", filter_format_color)
+	worksheet_result.write(0, 20, "시험 연구 설비의 취득", filter_format_color)
+	worksheet_result.write(0, 21, "렌탈 자산의 취득", filter_format_color)
+	worksheet_result.write(0, 22, "영업권의 취득", filter_format_color)
+	worksheet_result.write(0, 23, "산업재산권의 취득", filter_format_color)
+	worksheet_result.write(0, 24, "소프트웨어의 취득", filter_format_color)
+	worksheet_result.write(0, 25, "기타의무형자산의 취득", filter_format_color)
+	worksheet_result.write(0, 26, "투자부동산의 취득", filter_format_color)
+	worksheet_result.write(0, 27, "관계기업투자의 취득", filter_format_color)
+	worksheet_result.write(0, 28, "재무활동 현금흐름", filter_format_color)
+	worksheet_result.write(0, 29, "단기차입금의 증가", filter_format_color)
+	worksheet_result.write(0, 30, "배당금 지급", filter_format_color)
+	worksheet_result.write(0, 31, "자기주식의 취득", filter_format_color)
+	worksheet_result.write(0, 32, "기초현금 및 현금성자산", filter_format_color)
+	worksheet_result.write(0, 33, "기말현금 및 현금성자산", filter_format_color)
 
 	for k in range(len(dart_post_list)):
 		worksheet_result.write(k+1,0, dart_post_list[k][0], num2_format)
@@ -180,39 +175,39 @@ def write_excel_file(workbook_name, dart_post_list, cashflow_list, balance_sheet
 	worksheet_cashflow = workbook.add_worksheet('Cashflow Statement')
 	
 	worksheet_cashflow.set_column('A:A', 30)
-	worksheet_cashflow.write(0, 0, "결산년도", filter_format)
-	worksheet_cashflow.write(1, 0, "영업활동 현금흐름", filter_format)
-	worksheet_cashflow.write(2, 0, "영업에서 창출된 현금흐름", filter_format2)
-	worksheet_cashflow.write(3, 0, "당기순이익", filter_format2)
-	worksheet_cashflow.write(4, 0, "감가상각비", filter_format2)
-	worksheet_cashflow.write(5, 0, "신탁계정대", filter_format2)
-	worksheet_cashflow.write(6, 0, "투자활동 현금흐름", filter_format)
-	worksheet_cashflow.write(7, 0, "유형자산의 취득", filter_format2)
-	worksheet_cashflow.write(8, 0, "무형자산의 취득", filter_format2)
-	worksheet_cashflow.write(9, 0, "토지의 취득", filter_format2)
-	worksheet_cashflow.write(10, 0, "건물의 취득", filter_format2)
-	worksheet_cashflow.write(11, 0, "구축물의 취득", filter_format2)
-	worksheet_cashflow.write(12, 0, "기계장치의 취득", filter_format2)
-	worksheet_cashflow.write(13, 0, "건설중인자산의 증가", filter_format2)
-	worksheet_cashflow.write(14, 0, "차량운반구의 취득", filter_format2)
-	worksheet_cashflow.write(15, 0, "비품의 취득", filter_format2)
-	worksheet_cashflow.write(16, 0, "공구기구의 취득", filter_format2)
-	worksheet_cashflow.write(17, 0, "시험 연구 설비의 취득", filter_format2)
-	worksheet_cashflow.write(18, 0, "렌탈 자산의 취득", filter_format2)
-	worksheet_cashflow.write(19, 0, "영업권의 취득", filter_format2)
-	worksheet_cashflow.write(20, 0, "산업재산권의 취득", filter_format2)
-	worksheet_cashflow.write(21, 0, "소프트웨어의 취득", filter_format2)
-	worksheet_cashflow.write(22, 0, "기타의무형자산의 취득", filter_format2)
-	worksheet_cashflow.write(23, 0, "투자부동산의 취득", filter_format2)
-	worksheet_cashflow.write(24, 0, "관계기업투자의 취득", filter_format2)
-	worksheet_cashflow.write(25, 0, "재무활동 현금흐름", filter_format)
-	worksheet_cashflow.write(26, 0, "단기차입금의 증가", filter_format2)
-	worksheet_cashflow.write(27, 0, "배당금 지급", filter_format2)
-	worksheet_cashflow.write(28, 0, "자기주식의 취득", filter_format2)
-	worksheet_cashflow.write(29, 0, "기초현금 및 현금성자산", filter_format)
-	worksheet_cashflow.write(30, 0, "기말현금 및 현금성자산", filter_format)
-	worksheet_cashflow.write(31, 0, "당기순이익 손익계산서", filter_format2)
-	worksheet_cashflow.write(32, 0, "잉여현금흐름(FCF)", filter_format)
+	worksheet_cashflow.write(0, 0, "결산년도", filter_format_color)
+	worksheet_cashflow.write(1, 0, "영업활동 현금흐름", filter_format_color)
+	worksheet_cashflow.write(2, 0, "영업에서 창출된 현금흐름", filter_format)
+	worksheet_cashflow.write(3, 0, "당기순이익", filter_format)
+	worksheet_cashflow.write(4, 0, "감가상각비", filter_format)
+	worksheet_cashflow.write(5, 0, "신탁계정대", filter_format)
+	worksheet_cashflow.write(6, 0, "투자활동 현금흐름", filter_format_color)
+	worksheet_cashflow.write(7, 0, "유형자산의 취득", filter_format)
+	worksheet_cashflow.write(8, 0, "무형자산의 취득", filter_format)
+	worksheet_cashflow.write(9, 0, "토지의 취득", filter_format)
+	worksheet_cashflow.write(10, 0, "건물의 취득", filter_format)
+	worksheet_cashflow.write(11, 0, "구축물의 취득", filter_format)
+	worksheet_cashflow.write(12, 0, "기계장치의 취득", filter_format)
+	worksheet_cashflow.write(13, 0, "건설중인자산의 증가", filter_format)
+	worksheet_cashflow.write(14, 0, "차량운반구의 취득", filter_format)
+	worksheet_cashflow.write(15, 0, "비품의 취득", filter_format)
+	worksheet_cashflow.write(16, 0, "공구기구의 취득", filter_format)
+	worksheet_cashflow.write(17, 0, "시험 연구 설비의 취득", filter_format)
+	worksheet_cashflow.write(18, 0, "렌탈 자산의 취득", filter_format)
+	worksheet_cashflow.write(19, 0, "영업권의 취득", filter_format)
+	worksheet_cashflow.write(20, 0, "산업재산권의 취득", filter_format)
+	worksheet_cashflow.write(21, 0, "소프트웨어의 취득", filter_format)
+	worksheet_cashflow.write(22, 0, "기타의무형자산의 취득", filter_format)
+	worksheet_cashflow.write(23, 0, "투자부동산의 취득", filter_format)
+	worksheet_cashflow.write(24, 0, "관계기업투자의 취득", filter_format)
+	worksheet_cashflow.write(25, 0, "재무활동 현금흐름", filter_format_color)
+	worksheet_cashflow.write(26, 0, "단기차입금의 증가", filter_format)
+	worksheet_cashflow.write(27, 0, "배당금 지급", filter_format)
+	worksheet_cashflow.write(28, 0, "자기주식의 취득", filter_format)
+	worksheet_cashflow.write(29, 0, "기초현금 및 현금성자산", filter_format_color)
+	worksheet_cashflow.write(30, 0, "기말현금 및 현금성자산", filter_format_color)
+	worksheet_cashflow.write(31, 0, "당기순이익 손익계산서", filter_format)
+	worksheet_cashflow.write(32, 0, "잉여현금흐름(FCF)", filter_format_color)
 
 	prev_year = 0
 	j = 0
@@ -346,30 +341,30 @@ def write_excel_file(workbook_name, dart_post_list, cashflow_list, balance_sheet
 	equity_sum_list = []
 
 	worksheet_bs.set_column('A:A', 30)
-	worksheet_bs.write(0, 0, "결산년도", filter_format)
-	worksheet_bs.write(1, 0, "유동자산", filter_format)
-	worksheet_bs.write(2, 0, "현금 및 현금성 자산", filter_format2)
-	worksheet_bs.write(3, 0, "매출채권", filter_format2)
-	worksheet_bs.write(4, 0, "재고자산", filter_format2)
-	worksheet_bs.write(5, 0, "비유동자산", filter_format)
-	worksheet_bs.write(6, 0, "유형자산", filter_format2)
-	worksheet_bs.write(7, 0, "무형자산", filter_format2)
-	worksheet_bs.write(8, 0, "자산총계", filter_format)
-	worksheet_bs.write(9, 0, "유동부채", filter_format)
-	worksheet_bs.write(10, 0, "매입채무", filter_format2)
-	worksheet_bs.write(11, 0, "단기차입금", filter_format2)
-	worksheet_bs.write(12, 0, "미지급금", filter_format2)
-	worksheet_bs.write(13, 0, "비유동부채", filter_format)
-	worksheet_bs.write(14, 0, "사채", filter_format2)
-	worksheet_bs.write(15, 0, "장기차입금", filter_format2)
-	worksheet_bs.write(16, 0, "장기미지급금", filter_format2)
-	worksheet_bs.write(17, 0, "이연법인세부채", filter_format2)
-	worksheet_bs.write(18, 0, "부채총계", filter_format)
-	worksheet_bs.write(19, 0, "자본금", filter_format2)
-	worksheet_bs.write(20, 0, "주식발행초과금", filter_format2)
-	worksheet_bs.write(21, 0, "자본잉여금", filter_format2)
-	worksheet_bs.write(22, 0, "이익잉여금", filter_format2)
-	worksheet_bs.write(23, 0, "자본총계", filter_format)
+	worksheet_bs.write(0, 0, "결산년도", filter_format_color)
+	worksheet_bs.write(1, 0, "유동자산", filter_format_color)
+	worksheet_bs.write(2, 0, "현금 및 현금성 자산", filter_format)
+	worksheet_bs.write(3, 0, "매출채권", filter_format)
+	worksheet_bs.write(4, 0, "재고자산", filter_format)
+	worksheet_bs.write(5, 0, "비유동자산", filter_format_color)
+	worksheet_bs.write(6, 0, "유형자산", filter_format)
+	worksheet_bs.write(7, 0, "무형자산", filter_format)
+	worksheet_bs.write(8, 0, "자산총계", filter_format_color)
+	worksheet_bs.write(9, 0, "유동부채", filter_format_color)
+	worksheet_bs.write(10, 0, "매입채무", filter_format)
+	worksheet_bs.write(11, 0, "단기차입금", filter_format)
+	worksheet_bs.write(12, 0, "미지급금", filter_format)
+	worksheet_bs.write(13, 0, "비유동부채", filter_format_color)
+	worksheet_bs.write(14, 0, "사채", filter_format)
+	worksheet_bs.write(15, 0, "장기차입금", filter_format)
+	worksheet_bs.write(16, 0, "장기미지급금", filter_format)
+	worksheet_bs.write(17, 0, "이연법인세부채", filter_format)
+	worksheet_bs.write(18, 0, "부채총계", filter_format_color)
+	worksheet_bs.write(19, 0, "자본금", filter_format)
+	worksheet_bs.write(20, 0, "주식발행초과금", filter_format)
+	worksheet_bs.write(21, 0, "자본잉여금", filter_format)
+	worksheet_bs.write(22, 0, "이익잉여금", filter_format)
+	worksheet_bs.write(23, 0, "자본총계", filter_format_color)
 	
 	for k in range(len(balance_sheet_list)):
 		if balance_sheet_list[k]['asset_current_sub1'] != "FINDING LINE NUMBER ERROR":
@@ -426,24 +421,24 @@ def write_excel_file(workbook_name, dart_post_list, cashflow_list, balance_sheet
 	net_income_list = []
 	
 	worksheet_income.set_column('A:A', 30)
-	worksheet_income.write(0, 0, "결산년도", filter_format)
-	worksheet_income.write(1, 0, "매출액", filter_format)
-	worksheet_income.write(2, 0, "매출원가", filter_format2)
-	worksheet_income.write(3, 0, "매출총이익", filter_format2)
-	worksheet_income.write(4, 0, "판매비와관리비", filter_format2)
-	worksheet_income.write(5, 0, "영업수익", filter_format)
-	worksheet_income.write(6, 0, "영업비용", filter_format2)
-	worksheet_income.write(7, 0, "영업이익", filter_format)
-	worksheet_income.write(8, 0, "기타수익", filter_format2)
-	worksheet_income.write(9, 0, "기타비용", filter_format2)
-	worksheet_income.write(10, 0, "금융수익", filter_format2)
-	worksheet_income.write(11, 0, "금융비용", filter_format2)
-	worksheet_income.write(12, 0, "영업외수익", filter_format2)
-	worksheet_income.write(13, 0, "영업외비용", filter_format2)
-	worksheet_income.write(14, 0, "법인세비용차감전순이익", filter_format)
-	worksheet_income.write(15, 0, "법인세비용", filter_format2)
-	worksheet_income.write(16, 0, "당기순이익", filter_format)
-	#worksheet_income.write(17, 0, "기본주당이익", filter_format)
+	worksheet_income.write(0, 0, "결산년도", filter_format_color)
+	worksheet_income.write(1, 0, "매출액", filter_format_color)
+	worksheet_income.write(2, 0, "매출원가", filter_format)
+	worksheet_income.write(3, 0, "매출총이익", filter_format)
+	worksheet_income.write(4, 0, "판매비와관리비", filter_format)
+	worksheet_income.write(5, 0, "영업수익", filter_format_color)
+	worksheet_income.write(6, 0, "영업비용", filter_format)
+	worksheet_income.write(7, 0, "영업이익", filter_format_color)
+	worksheet_income.write(8, 0, "기타수익", filter_format)
+	worksheet_income.write(9, 0, "기타비용", filter_format)
+	worksheet_income.write(10, 0, "금융수익", filter_format)
+	worksheet_income.write(11, 0, "금융비용", filter_format)
+	worksheet_income.write(12, 0, "영업외수익", filter_format)
+	worksheet_income.write(13, 0, "영업외비용", filter_format)
+	worksheet_income.write(14, 0, "법인세비용차감전순이익", filter_format_color)
+	worksheet_income.write(15, 0, "법인세비용", filter_format)
+	worksheet_income.write(16, 0, "당기순이익", filter_format_color)
+	#worksheet_income.write(17, 0, "기본주당이익", filter_format_color)
 
 	for k in range(len(income_statement_list)):
 		if income_statement_list[k]['sales_sub1'] != "FINDING LINE NUMBER ERROR":
@@ -1265,6 +1260,41 @@ def scrape_income_statement(income_table, year, unit, mode):
 	print(income_statement_sub_list)
 	return income_statement_sub_list
 
+def get_corp_code(corp):
+	### PART I - Read Excel file for stock lists
+	num_stock = 2040
+	input_file = "basic_20171221.xlsx"
+	cur_dir = os.getcwd()
+	workbook_read_name = input_file
+	
+	stock_cat_list = []
+	stock_name_list = []
+	stock_num_list = []
+	stock_url_list = []
+	
+	workbook_read = xlrd.open_workbook(os.path.join(cur_dir, workbook_read_name))
+	sheet_list = workbook_read.sheets()
+	sheet1 = sheet_list[0]
+
+	for i in range(num_stock):
+		stock_cat_list.append(sheet1.cell(i+1,0).value)
+		stock_name_list.append(sheet1.cell(i+1,1).value)
+		stock_num_list.append(sheet1.cell(i+1,2).value)
+		stock_url_list.append(sheet1.cell(i+1,3).value)
+
+	find_index = stock_name_list.index(corp)
+
+	stock_code = ""
+
+	if find_index != -1:
+		stock_code = stock_num_list[find_index]
+		stock_cat = stock_cat_list[find_index]
+	else:
+		print("STOCK CODE ERROR")
+	return (stock_code, stock_cat)
+
+
+
 # Main function
 def main():
 
@@ -1297,40 +1327,12 @@ def main():
 		elif option == "--output" or option == "-o":
 			workbook_name = argument + ".xlsx"
 
+
 	re_income_find = re.compile("법[ \s]*인[ \s]*세[ \s]*비[ \s]*용(\(이익\))*[ \s]*차[ \s]*감[ \s]*전[ \s]*순[ \s]*((이[ \s]*익)|(손[ \s]*실))|법[ \s]*인[ \s]*세[ \s]*차[ \s]*감[ \s]*전[ \s]*계[ \s]*속[ \s]*영[ \s]*업[ \s]*순[ \s]*이[ \s]*익|법인세[ \s]*차감전[ \s]*순이익|법인세차감전계속영업이익|법인세비용차감전이익|법인세비용차감전계속영업[순]*이익|법인세비용차감전당기순이익|법인세(비용차감|손익가감)전순이익|법인세비용차감전[ \s]*계속사업이익|법인세비용차감전순손익")
 	re_cashflow_find = re.compile("영업활동[ \s]*현금[ \s]*흐름|영업활동으로[ \s]*인한[ \s]*[순]*현금[ \s]*흐름|영업활동으로부터의[ \s]*현금흐름|영업활동으로 인한 자산부채의 변동")
 	re_balance_sheet_find = re.compile("현[ \s]*금[ \s]*및[ \s]*현[ \s]*금[ \s]*((성[ \s]*자[ \s]*산)|(등[ \s]*가[ \s]*물))")
 
-	### PART I - Read Excel file for stock lists
-	num_stock = 2040
-	input_file = "basic_20171221.xlsx"
-	cur_dir = os.getcwd()
-	workbook_read_name = input_file
-	
-	stock_cat_list = []
-	stock_name_list = []
-	stock_num_list = []
-	stock_url_list = []
-	
-	workbook_read = xlrd.open_workbook(os.path.join(cur_dir, workbook_read_name))
-	sheet_list = workbook_read.sheets()
-	sheet1 = sheet_list[0]
-
-	for i in range(num_stock):
-		stock_cat_list.append(sheet1.cell(i+1,0).value)
-		stock_name_list.append(sheet1.cell(i+1,1).value)
-		stock_num_list.append(sheet1.cell(i+1,2).value)
-		stock_url_list.append(sheet1.cell(i+1,3).value)
-
-	find_index = stock_name_list.index(corp)
-
-	stock_code = ""
-
-	if find_index != -1:
-		stock_code = stock_num_list[find_index]
-		stock_cat = stock_cat_list[find_index]
-	else:
-		print("STOCK CODE ERROR")
+	(stock_code, stock_cat) = get_corp_code(corp)
 
 	# URL
 	#url_templete = "http://dart.fss.or.kr/dsab002/search.ax?reportName=%s&&maxResults=100&&textCrpNm=%s"
