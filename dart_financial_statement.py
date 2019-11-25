@@ -15,7 +15,7 @@ import yfinance as yf
 import pandas_datareader
 import numpy as np
 import matplotlib.pyplot as plt
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Scrape value
 def find_value(text, unit):
@@ -23,7 +23,7 @@ def find_value(text, unit):
 
 # Draw figure of cashflows.
 def draw_cashflow_figure(income_list, income_list2, year_list, op_cashflow_list, fcf_list, div_list, stock_close):
-	
+
 	for i in range(len(income_list)):
 		if income_list[i] == 0.0:
 			income_list[i] = income_list2[i]
@@ -48,7 +48,7 @@ def draw_cashflow_figure(income_list, income_list2, year_list, op_cashflow_list,
 
 # Draw figure of net income & assets.
 def draw_corp_history(year_list, asset_sum_list, liability_sum_list, equity_sum_list, sales_list, op_income_list, net_income_list):
-	
+
 	fig, ax1 = plt.subplots()
 
 	ax1.bar(year_list, equity_sum_list, label="Equity", color='gray')
@@ -59,13 +59,13 @@ def draw_corp_history(year_list, asset_sum_list, liability_sum_list, equity_sum_
 	ax1.set_xlabel("YEAR")
 	ax1.set_xticks(year_list)
 	plt.legend(loc=2)
-	
+
 	ax2 = ax1.twinx().twiny()
 	#ax2.plot(year_list, sales_list, label="Sales", color='g', marker='D', linestyle ='dashed')
 	ax2.plot(year_list, op_income_list, label="Op income", color='magenta', marker='D', linestyle ='dashed')
 	ax2.plot(year_list, net_income_list, label="Net income", color='g', marker='D', linestyle ='dashed')
 	plt.legend(loc=4)
-	
+
 	plt.show()
 
 
@@ -171,9 +171,9 @@ def write_excel_file(workbook_name, dart_post_list, cashflow_list, balance_sheet
 		worksheet_result.write(k+1,32, cashflow_list[k]	['start_cash']				, num2_format)
 		worksheet_result.write(k+1,33, cashflow_list[k]	['end_cash']				, num2_format)
 
-	cashflow_list.reverse() 
+	cashflow_list.reverse()
 	worksheet_cashflow = workbook.add_worksheet('Cashflow Statement')
-	
+
 	worksheet_cashflow.set_column('A:A', 30)
 	worksheet_cashflow.write(0, 0, "결산년도", filter_format_color)
 	worksheet_cashflow.write(1, 0, "영업활동 현금흐름", filter_format_color)
@@ -238,7 +238,7 @@ def write_excel_file(workbook_name, dart_post_list, cashflow_list, balance_sheet
 		fcf = fcf - abs(cashflow_list[k]['invest_cashflow_sub14'])
 		fcf = fcf - abs(cashflow_list[k]['invest_cashflow_sub15'])
 		fcf = fcf - abs(cashflow_list[k]['invest_cashflow_sub16'])
-	
+
 		if cashflow_list[k]['op_cashflow_sub1'] != "FINDING LINE NUMBER ERROR":
 			# Overwirting
 			if prev_year == cashflow_list[k]['year']:
@@ -275,7 +275,7 @@ def write_excel_file(workbook_name, dart_post_list, cashflow_list, balance_sheet
 				worksheet_cashflow.write(30, j, cashflow_list[k]['end_cash']				, num2_format)
 				worksheet_cashflow.write(31, j, cashflow_list[k]['net_income']				, num2_format)
 				worksheet_cashflow.write(32, j, fcf, num2_format)
-				
+
 				year_list[-1] = cashflow_list[k]['year']
 				op_cashflow_list[-1] = cashflow_list[k]['op_cashflow']
 				fcf_list[-1] = fcf
@@ -317,7 +317,7 @@ def write_excel_file(workbook_name, dart_post_list, cashflow_list, balance_sheet
 				worksheet_cashflow.write(30, j+1, cashflow_list[k]['end_cash']				, num2_format)
 				worksheet_cashflow.write(31, j+1, cashflow_list[k]['net_income']			, num2_format)
 				worksheet_cashflow.write(32, j+1, fcf, num2_format)
-			
+
 				year_list.append(cashflow_list[k]['year'])
 				op_cashflow_list.append(cashflow_list[k]['op_cashflow'])
 				fcf_list.append(fcf)
@@ -326,13 +326,13 @@ def write_excel_file(workbook_name, dart_post_list, cashflow_list, balance_sheet
 				div_list.append(abs(cashflow_list[k]['fin_cashflow_sub2']))
 				cash_equivalents_list.append(cashflow_list[k]['end_cash'])
 				j = j+1
-		
+
 			prev_year = cashflow_list[k]['year']
 
 	# Balance sheet
-	balance_sheet_list.reverse() 
+	balance_sheet_list.reverse()
 	worksheet_bs= workbook.add_worksheet('Balance Sheet')
-	
+
 	prev_year = 0
 	j = 0
 
@@ -365,7 +365,7 @@ def write_excel_file(workbook_name, dart_post_list, cashflow_list, balance_sheet
 	worksheet_bs.write(21, 0, "자본잉여금", filter_format)
 	worksheet_bs.write(22, 0, "이익잉여금", filter_format)
 	worksheet_bs.write(23, 0, "자본총계", filter_format_color)
-	
+
 	for k in range(len(balance_sheet_list)):
 		if balance_sheet_list[k]['asset_current_sub1'] != "FINDING LINE NUMBER ERROR":
 			# Overwirting
@@ -404,13 +404,13 @@ def write_excel_file(workbook_name, dart_post_list, cashflow_list, balance_sheet
 			worksheet_bs.write(21, w, balance_sheet_list[k]['equity_sub3']					, num2_format)
 			worksheet_bs.write(22, w, balance_sheet_list[k]['equity_sub2']					, num2_format)
 			worksheet_bs.write(23, w, balance_sheet_list[k]['equity_sum']					, num2_format)
-			
+
 			if prev_year != balance_sheet_list[k]['year']:
 				j = j+1
 			prev_year = balance_sheet_list[k]['year']
 
 	# Income statement
-	income_statement_list.reverse() 
+	income_statement_list.reverse()
 	worksheet_income= workbook.add_worksheet('Income Statement')
 
 	prev_year = 0
@@ -419,7 +419,7 @@ def write_excel_file(workbook_name, dart_post_list, cashflow_list, balance_sheet
 	sales_list = []
 	op_income_list = []
 	net_income_list = []
-	
+
 	worksheet_income.set_column('A:A', 30)
 	worksheet_income.write(0, 0, "결산년도", filter_format_color)
 	worksheet_income.write(1, 0, "매출액", filter_format_color)
@@ -472,14 +472,14 @@ def write_excel_file(workbook_name, dart_post_list, cashflow_list, balance_sheet
 			worksheet_income.write(15, w, income_statement_list[k]['tax']				, num2_format)
 			worksheet_income.write(16, w, income_statement_list[k]['net_income']		, num2_format)
 			#worksheet_income.write(17, w, income_statement_list[k]['eps']				, num2_format)
-			
+
 			if prev_year != income_statement_list[k]['year']:
 				j = j+1
 			prev_year = income_statement_list[k]['year']
-	
+
 	j = 0
-	
-	# Chart WORKSHEET	
+
+	# Chart WORKSHEET
 	#chart = workbook.add_chart({'type':'line'})
 	#chart.add_series({
 	#				'categories':'=cashflow!$B$1:$Q$1',
@@ -526,7 +526,7 @@ def write_excel_file(workbook_name, dart_post_list, cashflow_list, balance_sheet
 			unix_epoch = np.datetime64(0, 's')
 			one_second = np.timedelta64(1, 's')
 			seconds_since_epoch = (date - unix_epoch) / one_second
-			
+
 			day = datetime.utcfromtimestamp(seconds_since_epoch)
 			stock_date.append(day.strftime('%Y-%m-%d'))
 
@@ -534,11 +534,11 @@ def write_excel_file(workbook_name, dart_post_list, cashflow_list, balance_sheet
 
 		worksheet_stock.write(0, 0, "date")
 		worksheet_stock.write(0, 1, "Close")
-		
+
 		for i in range(len(stock_close)):
 			worksheet_stock.write(i+1, 0, stock_date[i])
 			worksheet_stock.write(i+1, 1, stock_close[i])
-		
+
 		chart = workbook.add_chart({'type':'line'})
 		chart.add_series({
 						'categories':'=stock_chart!$A$2:$A$'+str(len(stock_close)+1),
@@ -607,26 +607,26 @@ def scrape_balance_sheet(balance_sheet_table, year, unit):
 
 	re_asset_list.append(re_asset_current)
 	re_asset_list.append(re_asset_current_sub1)
-	re_asset_list.append(re_asset_current_sub2)		
-	re_asset_list.append(re_asset_current_sub3)		
+	re_asset_list.append(re_asset_current_sub2)
+	re_asset_list.append(re_asset_current_sub3)
 	re_asset_list.append(re_asset_non_current)
-	re_asset_list.append(re_asset_non_current_sub1)	
-	re_asset_list.append(re_asset_non_current_sub2)	
+	re_asset_list.append(re_asset_non_current_sub1)
+	re_asset_list.append(re_asset_non_current_sub2)
 	re_asset_list.append(re_asset_sum)
 	re_asset_list.append(re_liability_current)
 	re_asset_list.append(re_liability_current_sub1)
-	re_asset_list.append(re_liability_current_sub2)		
-	re_asset_list.append(re_liability_current_sub3)		
+	re_asset_list.append(re_liability_current_sub2)
+	re_asset_list.append(re_liability_current_sub3)
 	re_asset_list.append(re_liability_non_current)
-	re_asset_list.append(re_liability_non_current_sub1)	
-	re_asset_list.append(re_liability_non_current_sub2)	
-	re_asset_list.append(re_liability_non_current_sub3)	
-	re_asset_list.append(re_liability_non_current_sub4)	
+	re_asset_list.append(re_liability_non_current_sub1)
+	re_asset_list.append(re_liability_non_current_sub2)
+	re_asset_list.append(re_liability_non_current_sub3)
+	re_asset_list.append(re_liability_non_current_sub4)
 	re_asset_list.append(re_liability_sum)
 	re_asset_list.append(re_equity)
 	re_asset_list.append(re_equity_sub1)
 	re_asset_list.append(re_equity_sub3)
-	re_asset_list.append(re_equity_sub2)		
+	re_asset_list.append(re_equity_sub2)
 	re_asset_list.append(re_equity_sum)
 
 	balance_sheet_sub_list = {}
@@ -656,7 +656,7 @@ def scrape_balance_sheet(balance_sheet_table, year, unit):
 	balance_sheet_sub_list["equity_sum"]					=	0.0
 
 	balance_sheet_key_list = []
-	
+
 	balance_sheet_key_list.append("asset_current")
 	balance_sheet_key_list.append("asset_current_sub1")
 	balance_sheet_key_list.append("asset_current_sub2")
@@ -665,22 +665,22 @@ def scrape_balance_sheet(balance_sheet_table, year, unit):
 	balance_sheet_key_list.append("asset_non_current_sub1")
 	balance_sheet_key_list.append("asset_non_current_sub2")
 	balance_sheet_key_list.append("asset_sum")
-	balance_sheet_key_list.append("liability_current")			
-	balance_sheet_key_list.append("liability_current_sub1")		
-	balance_sheet_key_list.append("liability_current_sub2")		
-	balance_sheet_key_list.append("liability_current_sub3")		
-	balance_sheet_key_list.append("liability_non_current")		
-	balance_sheet_key_list.append("liability_non_current_sub1")	
-	balance_sheet_key_list.append("liability_non_current_sub2")	
-	balance_sheet_key_list.append("liability_non_current_sub3")	
-	balance_sheet_key_list.append("liability_non_current_sub4")	
-	balance_sheet_key_list.append("liability_sum")				
-	balance_sheet_key_list.append("equity")						
-	balance_sheet_key_list.append("equity_sub1")				
-	balance_sheet_key_list.append("equity_sub3")				
-	balance_sheet_key_list.append("equity_sub2")				
-	balance_sheet_key_list.append("equity_sum")					
-	
+	balance_sheet_key_list.append("liability_current")
+	balance_sheet_key_list.append("liability_current_sub1")
+	balance_sheet_key_list.append("liability_current_sub2")
+	balance_sheet_key_list.append("liability_current_sub3")
+	balance_sheet_key_list.append("liability_non_current")
+	balance_sheet_key_list.append("liability_non_current_sub1")
+	balance_sheet_key_list.append("liability_non_current_sub2")
+	balance_sheet_key_list.append("liability_non_current_sub3")
+	balance_sheet_key_list.append("liability_non_current_sub4")
+	balance_sheet_key_list.append("liability_sum")
+	balance_sheet_key_list.append("equity")
+	balance_sheet_key_list.append("equity_sub1")
+	balance_sheet_key_list.append("equity_sub3")
+	balance_sheet_key_list.append("equity_sub2")
+	balance_sheet_key_list.append("equity_sum")
+
 	trs = balance_sheet_table.findAll("tr")
 
 	# Balance sheet statement
@@ -713,39 +713,39 @@ def scrape_balance_sheet(balance_sheet_table, year, unit):
 				print(e)
 	# Special case
 	## if (len(trs) != 2):
-	else:	
+	else:
 		tr = trs[1]
 		tds = tr.findAll("td")
-		
+
 		index_col = []
 		prev = 0
 		for a in tds[0].childGenerator():
 			if (str(a) == "<br/>"):
 				if (prev == 1):
-					index_col.append('')	
+					index_col.append('')
 				prev = 1
 			else:
 				prev = 0
-				index_col.append(str(a).strip())	
+				index_col.append(str(a).strip())
 		data_col = []
 		prev = 0
 		for b in tds[1].childGenerator():
 			if (str(b) == "<br/>"):
 				if (prev == 1):
-					data_col.append('')	
+					data_col.append('')
 				prev = 1
 			else:
-				data_col.append(str(b))	
+				data_col.append(str(b))
 				prev = 0
 		data_col2 = []
 		prev = 0
 		for b in tds[2].childGenerator():
 			if (str(b) == "<br/>"):
 				if (prev == 1):
-					data_col2.append('')	
+					data_col2.append('')
 				prev = 1
 			else:
-				data_col2.append(str(b))	
+				data_col2.append(str(b))
 				prev = 0
 
 		print("##################################################")
@@ -795,7 +795,7 @@ def scrape_cashflows(cashflow_table, year, unit):
 	re_op_cashflow_sub2 	= re.compile("(연[ \s]*결[ \s]*)*당[ \s]*기[ \s]*순[ \s]*((이[ \s]*익)|(손[ \s]*익))")
 	re_op_cashflow_sub3 	= re.compile("감[ \s]*가[ \s]*상[ \s]*각[ \s]*비")
 	re_op_cashflow_sub4 	= re.compile("신[ \s]*탁[ \s]*계[ \s]*정[ \s]*대")
-	
+
 	re_invest_cashflow		= re.compile("투자[ \s]*활동[ \s]*현금[ \s]*흐름|투[ \s]*자[ \s]*활[ \s]*동[ \s]*으[ \s]*로[ \s]*인[ \s]*한[ \s]*[순]*현[ \s]*금[ \s]*흐[ \s]*름")
 	re_invest_cashflow_sub1 = re.compile("유[ \s]*형[ \s]*자[ \s]*산[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))")
 	re_invest_cashflow_sub2 = re.compile("무[ \s]*형[ \s]*자[ \s]*산[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))")
@@ -815,7 +815,7 @@ def scrape_cashflows(cashflow_table, year, unit):
 	re_invest_cashflow_sub16= re.compile("기[ \s]*타[ \s]*무[ \s]*형[ \s]*자[ \s]*산[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))")
 	re_invest_cashflow_sub17= re.compile("투[ \s]*자[ \s]*부[ \s]*통[ \s]*산[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))")
 	re_invest_cashflow_sub18= re.compile("관[ \s]*계[ \s]*기[ \s]*업[ \s]*투[ \s]*자[ \s]*의[ \s]*취[ \s]*득|관계[ \s]*기업[ \s]*투자[ \s]*주식의[ \s]*취득|지분법[ \s]*적용[ \s]*투자[ \s]*주식의[ \s]*취득")
-	
+
 	re_fin_cashflow			= re.compile("재무[ \s]*활동[ \s]*현금[ \s]*흐름|재무활동으로[ \s]*인한[ \s]*현금흐름")
 	re_fin_cashflow_sub1	= re.compile("단기차입금의[ \s]*순증가")
 	re_fin_cashflow_sub2	= re.compile("배당금[ \s]*지급|현금배당금의[ \s]*지급|배당금의[ \s]*지급|현금배당|보통주[ ]*배당[ ]*지급")
@@ -824,21 +824,21 @@ def scrape_cashflows(cashflow_table, year, unit):
 	re_end_cash				= re.compile("기말[ ]*현금[ ]*및[ ]*현금성[ ]*자산|기말의[ \s]*현금[ ]*및[ ]*현금성[ ]*자산|기[ \s]*말[ \s]*의[ \s]*현[ \s]*금|기[ \s]*말[ \s]*현[ \s]*금")
 
 	re_cashflow_list.append(re_op_cashflow)
-	re_cashflow_list.append(re_op_cashflow_sub1) 	
-	re_cashflow_list.append(re_op_cashflow_sub2) 	
-	re_cashflow_list.append(re_op_cashflow_sub3) 	
-	re_cashflow_list.append(re_op_cashflow_sub4) 	
-	
-	re_cashflow_list.append(re_invest_cashflow)		
-	re_cashflow_list.append(re_invest_cashflow_sub1) 
-	re_cashflow_list.append(re_invest_cashflow_sub2) 
-	re_cashflow_list.append(re_invest_cashflow_sub3) 
-	re_cashflow_list.append(re_invest_cashflow_sub4) 
-	re_cashflow_list.append(re_invest_cashflow_sub5) 
-	re_cashflow_list.append(re_invest_cashflow_sub6) 
-	re_cashflow_list.append(re_invest_cashflow_sub7) 
-	re_cashflow_list.append(re_invest_cashflow_sub8) 
-	re_cashflow_list.append(re_invest_cashflow_sub9) 
+	re_cashflow_list.append(re_op_cashflow_sub1)
+	re_cashflow_list.append(re_op_cashflow_sub2)
+	re_cashflow_list.append(re_op_cashflow_sub3)
+	re_cashflow_list.append(re_op_cashflow_sub4)
+
+	re_cashflow_list.append(re_invest_cashflow)
+	re_cashflow_list.append(re_invest_cashflow_sub1)
+	re_cashflow_list.append(re_invest_cashflow_sub2)
+	re_cashflow_list.append(re_invest_cashflow_sub3)
+	re_cashflow_list.append(re_invest_cashflow_sub4)
+	re_cashflow_list.append(re_invest_cashflow_sub5)
+	re_cashflow_list.append(re_invest_cashflow_sub6)
+	re_cashflow_list.append(re_invest_cashflow_sub7)
+	re_cashflow_list.append(re_invest_cashflow_sub8)
+	re_cashflow_list.append(re_invest_cashflow_sub9)
 	re_cashflow_list.append(re_invest_cashflow_sub10)
 	re_cashflow_list.append(re_invest_cashflow_sub11)
 	re_cashflow_list.append(re_invest_cashflow_sub12)
@@ -848,11 +848,11 @@ def scrape_cashflows(cashflow_table, year, unit):
 	re_cashflow_list.append(re_invest_cashflow_sub16)
 	re_cashflow_list.append(re_invest_cashflow_sub17)
 	re_cashflow_list.append(re_invest_cashflow_sub18)
-	
-	re_cashflow_list.append(re_fin_cashflow)		
-	re_cashflow_list.append(re_fin_cashflow_sub1)	
-	re_cashflow_list.append(re_fin_cashflow_sub2)	
-	re_cashflow_list.append(re_fin_cashflow_sub3)	
+
+	re_cashflow_list.append(re_fin_cashflow)
+	re_cashflow_list.append(re_fin_cashflow_sub1)
+	re_cashflow_list.append(re_fin_cashflow_sub2)
+	re_cashflow_list.append(re_fin_cashflow_sub3)
 	re_cashflow_list.append(re_start_cash)
 	re_cashflow_list.append(re_end_cash)
 
@@ -883,7 +883,7 @@ def scrape_cashflows(cashflow_table, year, unit):
 	# 기말 현금 및 현금성자산
 
 	cashflow_sub_list = {}
-	
+
 	cashflow_sub_list['year']					= year
 	cashflow_sub_list["op_cashflow"]			= 0.0
 	cashflow_sub_list["op_cashflow_sub1"]		= 0.0
@@ -951,9 +951,9 @@ def scrape_cashflows(cashflow_table, year, unit):
 
 	#net_income = 0.0
 	#print("len(trs)", len(trs))
-	
+
 	trs = cashflow_table.findAll("tr")
-			
+
 	# CASHFLOW statement
 	if (len(trs) != 2):
 		for tr in trs:
@@ -989,39 +989,39 @@ def scrape_cashflows(cashflow_table, year, unit):
 				print(e)
 	# Special case
 	## if (len(trs) != 2):
-	else:	
+	else:
 		tr = trs[1]
 		tds = tr.findAll("td")
-		
+
 		index_col = []
 		prev = 0
 		for a in tds[0].childGenerator():
 			if (str(a) == "<br/>"):
 				if (prev == 1):
-					index_col.append('')	
+					index_col.append('')
 				prev = 1
 			else:
 				prev = 0
-				index_col.append(str(a).strip())	
+				index_col.append(str(a).strip())
 		data_col = []
 		prev = 0
 		for b in tds[1].childGenerator():
 			if (str(b) == "<br/>"):
 				if (prev == 1):
-					data_col.append('0')	
+					data_col.append('0')
 				prev = 1
 			else:
-				data_col.append(str(b))	
+				data_col.append(str(b))
 				prev = 0
 		data_col2 = []
 		prev = 0
 		for b in tds[2].childGenerator():
 			if (str(b) == "<br/>"):
 				if (prev == 1):
-					data_col2.append('')	
+					data_col2.append('')
 				prev = 1
 			else:
-				data_col2.append(str(b))	
+				data_col2.append(str(b))
 				prev = 0
 
 		#print(index_col)
@@ -1076,7 +1076,7 @@ def scrape_income_statement(income_table, year, unit, mode):
 	#기본주당이익
 
 	re_income_list = []
-	
+
 	# Regular expression
 	re_sales			=	re.compile("^매[ \s]*출[ \s]*액|\.[ \s]*매[ \s]*출[ \s]*액|\(매출액\)")
 	re_sales_sub1		= 	re.compile("^매[ \s]*출[ \s]*원[ \s]*가|\.[ \s]*매[ \s]*출[ \s]*원[ \s]*가")
@@ -1096,23 +1096,23 @@ def scrape_income_statement(income_table, year, unit, mode):
 	re_net_income		=	re.compile("^순[ \s]*이[ \s]*익|^당[ \s]*기[ \s]*순[ \s]*이[ \s]*익|^연[ ]*결[ ]*[총 ]*당[ ]*기[ ]*순[ ]*이[ ]*익|지배기업의 소유주에게 귀속되는 당기순이익|분기순이익|당\(분\)기순이익|\.[ \s]*당[ \s]*기[ \s]*순[ \s]*이[ \s]*익|당분기연결순이익")
 	re_eps				=	re.compile("기[ \s]*본[ \s]*주[ \s]*당[ \s]*((수[ \s]*익)|([순 \s]*이[ \s]*익))")
 
-	re_income_list.append(re_sales)	
-	re_income_list.append(re_sales_sub1)		 	
-	re_income_list.append(re_sales_sub2)		 	
-	re_income_list.append(re_sales_sub3)		 	
-	re_income_list.append(re_sales2)	
-	re_income_list.append(re_sales2_sub1)		 	
-	re_income_list.append(re_op_income)		 	
-	re_income_list.append(re_op_income_sub1)	 	
-	re_income_list.append(re_op_income_sub2)	 	
-	re_income_list.append(re_op_income_sub3)	 	
-	re_income_list.append(re_op_income_sub4)	 	
-	re_income_list.append(re_op_income_sub5)	 	
-	re_income_list.append(re_op_income_sub6)	 	
-	re_income_list.append(re_op_income_sub7)	 	
+	re_income_list.append(re_sales)
+	re_income_list.append(re_sales_sub1)
+	re_income_list.append(re_sales_sub2)
+	re_income_list.append(re_sales_sub3)
+	re_income_list.append(re_sales2)
+	re_income_list.append(re_sales2_sub1)
+	re_income_list.append(re_op_income)
+	re_income_list.append(re_op_income_sub1)
+	re_income_list.append(re_op_income_sub2)
+	re_income_list.append(re_op_income_sub3)
+	re_income_list.append(re_op_income_sub4)
+	re_income_list.append(re_op_income_sub5)
+	re_income_list.append(re_op_income_sub6)
+	re_income_list.append(re_op_income_sub7)
 	re_income_list.append(re_tax)
 	re_income_list.append(re_net_income)
-	re_income_list.append(re_eps)				
+	re_income_list.append(re_eps)
 
 	income_statement_sub_list = {}
 	income_statement_sub_list["sales"]				=	0.0
@@ -1135,23 +1135,23 @@ def scrape_income_statement(income_table, year, unit, mode):
 	income_statement_sub_list['year']				=	year
 
 	income_statement_key_list = []
-	income_statement_key_list.append("sales")			
-	income_statement_key_list.append("sales_sub1")		
-	income_statement_key_list.append("sales_sub2")		
-	income_statement_key_list.append("sales_sub3")		
-	income_statement_key_list.append("sales2")			
-	income_statement_key_list.append("sales2_sub1")		
-	income_statement_key_list.append("op_income")		
-	income_statement_key_list.append("op_income_sub1")	
-	income_statement_key_list.append("op_income_sub2")	
-	income_statement_key_list.append("op_income_sub3")	
-	income_statement_key_list.append("op_income_sub4")	
-	income_statement_key_list.append("op_income_sub5")	
-	income_statement_key_list.append("op_income_sub6")	
-	income_statement_key_list.append("op_income_sub7")	
-	income_statement_key_list.append("tax")			
-	income_statement_key_list.append("net_income")		
-	income_statement_key_list.append("eps")			
+	income_statement_key_list.append("sales")
+	income_statement_key_list.append("sales_sub1")
+	income_statement_key_list.append("sales_sub2")
+	income_statement_key_list.append("sales_sub3")
+	income_statement_key_list.append("sales2")
+	income_statement_key_list.append("sales2_sub1")
+	income_statement_key_list.append("op_income")
+	income_statement_key_list.append("op_income_sub1")
+	income_statement_key_list.append("op_income_sub2")
+	income_statement_key_list.append("op_income_sub3")
+	income_statement_key_list.append("op_income_sub4")
+	income_statement_key_list.append("op_income_sub5")
+	income_statement_key_list.append("op_income_sub6")
+	income_statement_key_list.append("op_income_sub7")
+	income_statement_key_list.append("tax")
+	income_statement_key_list.append("net_income")
+	income_statement_key_list.append("eps")
 
 	trs = income_table.findAll("tr")
 
@@ -1194,42 +1194,42 @@ def scrape_income_statement(income_table, year, unit, mode):
 				print(e)
 				net_income = 0.0
 	## if (len(trs) != 2):
-	else:	
+	else:
 		income_tr = trs[1]
 		tds = income_tr.findAll("td")
-		
+
 		index_col = []
 		prev = 0
 		for a in tds[0].childGenerator():
 			if (str(a) == "<br/>"):
 				if (prev == 1):
-					index_col.append('')	
+					index_col.append('')
 				prev = 1
 			else:
 				prev = 0
-				index_col.append(str(a).strip())	
+				index_col.append(str(a).strip())
 		data_col = []
 		prev = 0
 		for b in tds[1].childGenerator():
 			if (str(b) == "<br/>"):
 				if (prev == 1):
-					data_col.append('0')	
+					data_col.append('0')
 				prev = 1
 			else:
-				data_col.append(str(b))	
+				data_col.append(str(b))
 				prev = 0
 		data_col2 = []
 		prev = 0
 		for b in tds[2].childGenerator():
 			if (str(b) == "<br/>"):
 				if (prev == 1):
-					data_col2.append('')	
+					data_col2.append('')
 				prev = 1
 			else:
-				data_col2.append(str(b))	
+				data_col2.append(str(b))
 				prev = 0
 
-		
+
 		print(len(index_col))
 		print(len(data_col))
 		index_cnt = 0
@@ -1266,12 +1266,12 @@ def get_corp_code(corp):
 	input_file = "basic_20171221.xlsx"
 	cur_dir = os.getcwd()
 	workbook_read_name = input_file
-	
+
 	stock_cat_list = []
 	stock_name_list = []
 	stock_num_list = []
 	stock_url_list = []
-	
+
 	workbook_read = xlrd.open_workbook(os.path.join(cur_dir, workbook_read_name))
 	sheet_list = workbook_read.sheets()
 	sheet1 = sheet_list[0]
@@ -1332,27 +1332,29 @@ def main():
 	re_cashflow_find = re.compile("영업활동[ \s]*현금[ \s]*흐름|영업활동으로[ \s]*인한[ \s]*[순]*현금[ \s]*흐름|영업활동으로부터의[ \s]*현금흐름|영업활동으로 인한 자산부채의 변동")
 	re_balance_sheet_find = re.compile("현[ \s]*금[ \s]*및[ \s]*현[ \s]*금[ \s]*((성[ \s]*자[ \s]*산)|(등[ \s]*가[ \s]*물))")
 
-	(stock_code, stock_cat) = get_corp_code(corp)
+	stock_code, stock_cat = get_corp_code(corp)
 
 	# URL
 	#url_templete = "http://dart.fss.or.kr/dsab002/search.ax?reportName=%s&&maxResults=100&&textCrpNm=%s"
 	url_templete = "http://dart.fss.or.kr/dsab002/search.ax?reportName=%s&&maxResults=100&&textCrpNm=%s&&startDate=%s&&endDate=%s"
 	headers = {'Cookie':'DSAB002_MAXRESULTS=5000;'}
-	
+
 	dart_post_list = []
 	cashflow_list = []
 	balance_sheet_list = []
 	income_statement_list = []
-	
+
 	current_time = datetime.now()
 	year = current_time.year
 	start_day = datetime(2005,1,1)
-	end_day = datetime(2017,11,15)
 	end_day = datetime(current_time.year,current_time.month,current_time.day)
 	delta = end_day - start_day
 
-	start_day2 = datetime(2017,10,15)
-	end_day2 = datetime(current_time.year,current_time.month,current_time.day)
+
+	# 최근 보고서 검색
+	start_day2 = datetime.today() - timedelta(days=90)
+	end_day2 = datetime.today()
+
 	# http://coderstoolbox.net/string/#!encoding=url&action=encode&charset=utf_8
 	# 사업보고서
 	report_year = "%EC%82%AC%EC%97%85%EB%B3%B4%EA%B3%A0%EC%84%9C"
@@ -1363,11 +1365,14 @@ def main():
 
 
 	# 최신 분기보고서 읽기
-	handle = urllib.request.urlopen(url_templete % (report_quarter, urllib.parse.quote(corp), start_day2.strftime('%Y%m%d'), end_day2.strftime('%Y%m%d')))
+	handle = urllib.request.urlopen(url_templete % (report_year, urllib.parse.quote(corp), start_day2.strftime('%Y%m%d'), end_day2.strftime('%Y%m%d')))
+	print(url_templete % (report_year, urllib.parse.quote(corp), start_day2.strftime('%Y%m%d'), end_day2.strftime('%Y%m%d')))
+
+
 
 	data = handle.read()
 	soup = BeautifulSoup(data, 'html.parser', from_encoding='utf-8')
-	
+
 	table = soup.find('table')
 	trs = table.findAll('tr')
 	tds = table.findAll('td')
