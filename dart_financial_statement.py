@@ -15,6 +15,7 @@ import pandas_datareader
 import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
+import threading
 
 # Scrape value
 def find_value(text, unit):
@@ -549,8 +550,8 @@ def write_excel_file(workbook_name, dart_post_list, cashflow_list, balance_sheet
 
 	workbook.close()
 	# Deactivate
-	draw_cashflow_figure(income_list, income_list2, year_list, op_cashflow_list, fcf_list, div_list, stock_close)
-	draw_corp_history(year_list, asset_sum_list, liability_sum_list, equity_sum_list, sales_list, op_income_list, net_income_list)
+	#draw_cashflow_figure(income_list, income_list2, year_list, op_cashflow_list, fcf_list, div_list, stock_close)
+	#draw_corp_history(year_list, asset_sum_list, liability_sum_list, equity_sum_list, sales_list, op_income_list, net_income_list)
 
 # Get information of balance sheet
 def scrape_balance_sheet(balance_sheet_table, year, unit):
@@ -1290,17 +1291,18 @@ def get_corp_code(corp):
 		stock_cat = stock_cat_list[find_index]
 	else:
 		print("STOCK CODE ERROR")
+
 	return (stock_code, stock_cat)
 
 
 
 # Main function
-def main():
+def main(corp = "삼성전자"):
 
 	# Default
-	corp = "삼성전자"
+	#corp = "삼성전자"
 	#corp = "LG화학"
-	workbook_name = "DART_financial_statement.xlsx"
+	workbook_name = "all/" + corp + ".xlsx"
 
 	try:
 		opts, args = getopt.getopt(sys.argv[1:], "c:o:h", ["corp=", "output", "help"])
@@ -1333,6 +1335,7 @@ def main():
 
 	stock_code, stock_cat = get_corp_code(corp)
 
+	workbook_name = "all/" + stock_cat + "_" + stock_code + "_" + corp + ".xlsx"
 	# URL
 	#url_templete = "http://dart.fss.or.kr/dsab002/search.ax?reportName=%s&&maxResults=100&&textCrpNm=%s"
 	url_templete = "http://dart.fss.or.kr/dsab002/search.ax?reportName=%s&&maxResults=100&&textCrpNm=%s&&startDate=%s&&endDate=%s"
@@ -2037,4 +2040,20 @@ def main():
 
 # Main
 if __name__ == "__main__":
-	main()
+	num_stock = 2040
+	input_file = "basic_20171221.xlsx"
+	cur_dir = os.getcwd()
+	workbook_read_name = input_file
+
+	stock_cat_list = []
+	stock_name_list = []
+	stock_num_list = []
+	stock_url_list = []
+
+	workbook_read = xlrd.open_workbook(os.path.join(cur_dir, workbook_read_name))
+	sheet_list = workbook_read.sheets()
+	sheet1 = sheet_list[0]
+	for i in range(num_stock):
+		#t1 = threading.Thread(target=main, args=(sheet1.cell(i + 1, 1).value))
+		#t1.start()
+		main(sheet1.cell(i+1,1).value)
