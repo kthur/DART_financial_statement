@@ -15,7 +15,7 @@ import pandas_datareader
 import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
-import threading
+
 
 # Scrape value
 def find_value(text, unit):
@@ -579,107 +579,43 @@ def scrape_balance_sheet(balance_sheet_table, year, unit):
 	##이익잉여금
 	#자본총계
 
+	ASSET_LIST = dict(
+		asset_current=("^유[ \s]*동[ \s]*자[ \s]*산([ \s]*합[ \s]*계)*|\.[ \s]*유[ \s]*동[ \s]*자[ \s]*산([ \s]*합[ \s]*계)*"),
+		asset_current_sub1=("현[ \s]*금[ \s]*및[ \s]*현[ \s]*금[ \s]*((성[ \s]*자[ \s]*산)|(등[ \s]*가[ \s]*물))"),
+		asset_current_sub2=("매[ \s]*출[ \s]*채[ \s]*권"),
+		asset_current_sub3=("재[ \s]*고[ \s]*자[ \s]*산"),
+		asset_non_current=("비[ \s]*유[ \s]*동[ \s]*자[ \s]*산|고[ \s]*정[ \s]*자[ \s]*산([ \s]*합[ \s]*계)*"),
+		asset_non_current_sub1=("유[ \s]*형[ \s]*자[ \s]*산"),
+		asset_non_current_sub2=("무[ \s]*형[ \s]*자[ \s]*산"),
+		asset_sum=("자[ \s]*산[ \s]*총[ \s]*계([ \s]*합[ \s]*계)*"),
+		liability_current=("^유[ \s]*동[ \s]*부[ \s]*채([ \s]*합[ \s]*계)*|\.[ \s]*유[ \s]*동[ \s]*부[ \s]*채([ \s]*합[ \s]*계)*"),
+		liability_current_sub1=("매[ \s]*입[ \s]*채[ \s]*무[ \s]*"),
+		liability_current_sub2=("단[ \s]*기[ \s]*차[ \s]*입[ \s]*금"),
+		liability_current_sub3=("^미[ \s]*지[ \s]*급[ \s]*금[ \s]*"),
+		liability_non_current=("^비[ \s]*유[ \s]*동[ \s]*부[ \s]*채|\.[ \s]*비[ \s]*유[ \s]*동[ \s]*부[ \s]*채|고[ \s]*정[ \s]*부[ \s]*채"),
+		liability_non_current_sub1=("사[ \s]*채[ \s]*"),
+		liability_non_current_sub2=("장[ \s]*기[ \s]*차[ \s]*입[ \s]*금"),
+		liability_non_current_sub3=("장[ \s]*기[ \s]*미[ \s]*지[ \s]*급[ \s]*금"),
+		liability_non_current_sub4=("이[ \s]*연[ \s]*법[ \s]*인[ \s]*세[ \s]*부[ \s]*채"),
+		liability_sum=("^부[ \s]*채[ \s]*총[ \s]*계([ \s]*합[ \s]*계)*|\.[ \s]*부[ \s]*채[ \s]*총[ \s]*계([ \s]*합[ \s]*계)*"),
+		equity=("자[ \s]*본[ \s]*금"),
+		equity_sub1=("주[ \s]*식[ \s]*발[ \s]*행[ \s]*초[ \s]*과[ \s]*금"),
+		equity_sub3=("자[ \s]*본[ \s]*잉[ \s]*여[ \s]*금"),
+		equity_sub2=("이[ \s]*익[ \s]*잉[ \s]*여[ \s]*금"),
+		equity_sum=(	"^자[ \s]*본[ \s]*총[ \s]*계([ \s]*합[ \s]*계)*|\.[ \s]*자[ \s]*본[ \s]*총[ \s]*계([ \s]*합[ \s]*계)*") )
+
 	re_asset_list = []
-
-	re_asset_current				=	re.compile("^유[ \s]*동[ \s]*자[ \s]*산([ \s]*합[ \s]*계)*|\.[ \s]*유[ \s]*동[ \s]*자[ \s]*산([ \s]*합[ \s]*계)*")
-	re_asset_current_sub1			=	re.compile("현[ \s]*금[ \s]*및[ \s]*현[ \s]*금[ \s]*((성[ \s]*자[ \s]*산)|(등[ \s]*가[ \s]*물))")
-	re_asset_current_sub2			=	re.compile("매[ \s]*출[ \s]*채[ \s]*권")
-	re_asset_current_sub3			=	re.compile("재[ \s]*고[ \s]*자[ \s]*산")
-	re_asset_non_current			=	re.compile("비[ \s]*유[ \s]*동[ \s]*자[ \s]*산|고[ \s]*정[ \s]*자[ \s]*산([ \s]*합[ \s]*계)*")
-	re_asset_non_current_sub1		=	re.compile("유[ \s]*형[ \s]*자[ \s]*산")
-	re_asset_non_current_sub2		=	re.compile("무[ \s]*형[ \s]*자[ \s]*산")
-	re_asset_sum					=	re.compile("자[ \s]*산[ \s]*총[ \s]*계([ \s]*합[ \s]*계)*")
-	re_liability_current			=	re.compile("^유[ \s]*동[ \s]*부[ \s]*채([ \s]*합[ \s]*계)*|\.[ \s]*유[ \s]*동[ \s]*부[ \s]*채([ \s]*합[ \s]*계)*")
-	re_liability_current_sub1		=	re.compile("매[ \s]*입[ \s]*채[ \s]*무[ \s]*")
-	re_liability_current_sub2		=	re.compile("단[ \s]*기[ \s]*차[ \s]*입[ \s]*금")
-	re_liability_current_sub3		=	re.compile("^미[ \s]*지[ \s]*급[ \s]*금[ \s]*")
-	re_liability_non_current		=	re.compile("^비[ \s]*유[ \s]*동[ \s]*부[ \s]*채|\.[ \s]*비[ \s]*유[ \s]*동[ \s]*부[ \s]*채|고[ \s]*정[ \s]*부[ \s]*채")
-	re_liability_non_current_sub1	=	re.compile("사[ \s]*채[ \s]*")
-	re_liability_non_current_sub2	=	re.compile("장[ \s]*기[ \s]*차[ \s]*입[ \s]*금")
-	re_liability_non_current_sub3	=	re.compile("장[ \s]*기[ \s]*미[ \s]*지[ \s]*급[ \s]*금")
-	re_liability_non_current_sub4	=	re.compile("이[ \s]*연[ \s]*법[ \s]*인[ \s]*세[ \s]*부[ \s]*채")
-	re_liability_sum				=	re.compile("^부[ \s]*채[ \s]*총[ \s]*계([ \s]*합[ \s]*계)*|\.[ \s]*부[ \s]*채[ \s]*총[ \s]*계([ \s]*합[ \s]*계)*")
-	re_equity						=	re.compile("자[ \s]*본[ \s]*금")
-	re_equity_sub1					=	re.compile("주[ \s]*식[ \s]*발[ \s]*행[ \s]*초[ \s]*과[ \s]*금")
-	re_equity_sub3					=	re.compile("자[ \s]*본[ \s]*잉[ \s]*여[ \s]*금")
-	re_equity_sub2					=	re.compile("이[ \s]*익[ \s]*잉[ \s]*여[ \s]*금")
-	re_equity_sum					=	re.compile("^자[ \s]*본[ \s]*총[ \s]*계([ \s]*합[ \s]*계)*|\.[ \s]*자[ \s]*본[ \s]*총[ \s]*계([ \s]*합[ \s]*계)*")
-
-	re_asset_list.append(re_asset_current)
-	re_asset_list.append(re_asset_current_sub1)
-	re_asset_list.append(re_asset_current_sub2)
-	re_asset_list.append(re_asset_current_sub3)
-	re_asset_list.append(re_asset_non_current)
-	re_asset_list.append(re_asset_non_current_sub1)
-	re_asset_list.append(re_asset_non_current_sub2)
-	re_asset_list.append(re_asset_sum)
-	re_asset_list.append(re_liability_current)
-	re_asset_list.append(re_liability_current_sub1)
-	re_asset_list.append(re_liability_current_sub2)
-	re_asset_list.append(re_liability_current_sub3)
-	re_asset_list.append(re_liability_non_current)
-	re_asset_list.append(re_liability_non_current_sub1)
-	re_asset_list.append(re_liability_non_current_sub2)
-	re_asset_list.append(re_liability_non_current_sub3)
-	re_asset_list.append(re_liability_non_current_sub4)
-	re_asset_list.append(re_liability_sum)
-	re_asset_list.append(re_equity)
-	re_asset_list.append(re_equity_sub1)
-	re_asset_list.append(re_equity_sub3)
-	re_asset_list.append(re_equity_sub2)
-	re_asset_list.append(re_equity_sum)
+	for i in ASSET_LIST.keys():
+		re_asset_list.append(re.compile(ASSET_LIST[i]))
 
 	balance_sheet_sub_list = {}
-	balance_sheet_sub_list["asset_current"]					=	0.0
-	balance_sheet_sub_list["asset_current_sub1"]			=	0.0
-	balance_sheet_sub_list["asset_current_sub2"]			=	0.0
-	balance_sheet_sub_list["asset_current_sub3"]			=	0.0
-	balance_sheet_sub_list["asset_non_current"]				=	0.0
-	balance_sheet_sub_list["asset_non_current_sub1"]		=	0.0
-	balance_sheet_sub_list["asset_non_current_sub2"]		=	0.0
-	balance_sheet_sub_list["asset_sum"]						=	0.0
-	balance_sheet_sub_list['year']							=	year
-	balance_sheet_sub_list["liability_current"]				=	0.0
-	balance_sheet_sub_list["liability_current_sub1"]		=	0.0
-	balance_sheet_sub_list["liability_current_sub2"]		=	0.0
-	balance_sheet_sub_list["liability_current_sub3"]		=	0.0
-	balance_sheet_sub_list["liability_non_current"]			=	0.0
-	balance_sheet_sub_list["liability_non_current_sub1"]	=	0.0
-	balance_sheet_sub_list["liability_non_current_sub2"]	=	0.0
-	balance_sheet_sub_list["liability_non_current_sub3"]	=	0.0
-	balance_sheet_sub_list["liability_non_current_sub4"]	=	0.0
-	balance_sheet_sub_list["liability_sum"]					=	0.0
-	balance_sheet_sub_list["equity"]						=	0.0
-	balance_sheet_sub_list["equity_sub1"]					=	0.0
-	balance_sheet_sub_list["equity_sub3"]					=	0.0
-	balance_sheet_sub_list["equity_sub2"]					=	0.0
-	balance_sheet_sub_list["equity_sum"]					=	0.0
+	for i in ASSET_LIST.keys():
+		balance_sheet_sub_list[i] = 0.0
+	balance_sheet_sub_list['year'] = year
 
 	balance_sheet_key_list = []
-
-	balance_sheet_key_list.append("asset_current")
-	balance_sheet_key_list.append("asset_current_sub1")
-	balance_sheet_key_list.append("asset_current_sub2")
-	balance_sheet_key_list.append("asset_current_sub3")
-	balance_sheet_key_list.append("asset_non_current")
-	balance_sheet_key_list.append("asset_non_current_sub1")
-	balance_sheet_key_list.append("asset_non_current_sub2")
-	balance_sheet_key_list.append("asset_sum")
-	balance_sheet_key_list.append("liability_current")
-	balance_sheet_key_list.append("liability_current_sub1")
-	balance_sheet_key_list.append("liability_current_sub2")
-	balance_sheet_key_list.append("liability_current_sub3")
-	balance_sheet_key_list.append("liability_non_current")
-	balance_sheet_key_list.append("liability_non_current_sub1")
-	balance_sheet_key_list.append("liability_non_current_sub2")
-	balance_sheet_key_list.append("liability_non_current_sub3")
-	balance_sheet_key_list.append("liability_non_current_sub4")
-	balance_sheet_key_list.append("liability_sum")
-	balance_sheet_key_list.append("equity")
-	balance_sheet_key_list.append("equity_sub1")
-	balance_sheet_key_list.append("equity_sub3")
-	balance_sheet_key_list.append("equity_sub2")
-	balance_sheet_key_list.append("equity_sum")
+	for i in ASSET_LIST.keys():
+		balance_sheet_key_list.append(i)
 
 	trs = balance_sheet_table.findAll("tr")
 
@@ -1668,7 +1604,7 @@ def main(corp = "삼성전자"):
 	#handle = urllib.request.urlopen(url_templete % (report, urllib.parse.quote(corp)))
 	#print("URL" + url_templete % (report, corp))
 	handle = urllib.request.urlopen(url_templete % (report_year, urllib.parse.quote(corp), start_day.strftime('%Y%m%d'), end_day.strftime('%Y%m%d')))
-	print("URL" + url_templete % (report_year, corp, start_day.strftime('%Y%m%d'), end_day.strftime('%Y%m%d')))
+	print("URL", url_templete % (report_year, corp, start_day.strftime('%Y%m%d'), end_day.strftime('%Y%m%d')))
 
 	data = handle.read()
 	soup = BeautifulSoup(data, 'html.parser', from_encoding='utf-8')
@@ -2053,7 +1989,8 @@ if __name__ == "__main__":
 	workbook_read = xlrd.open_workbook(os.path.join(cur_dir, workbook_read_name))
 	sheet_list = workbook_read.sheets()
 	sheet1 = sheet_list[0]
-	for i in range(num_stock):
+	for i in range(77, num_stock):
 		#t1 = threading.Thread(target=main, args=(sheet1.cell(i + 1, 1).value))
 		#t1.start()
+		print("number", i, sheet1.cell(i + 1, 0).value, sheet1.cell(i + 1, 1).value, sheet1.cell(i + 1, 2).value, sheet1.cell(i + 1, 3).value)
 		main(sheet1.cell(i+1,1).value)
