@@ -504,7 +504,12 @@ def write_excel_file(workbook_name, dart_post_list, cashflow_list, balance_sheet
 
 	#worksheet_cashflow.insert_chart('C30', chart)
 
-	old_year = cashflow_list[0]['year']
+	try:
+		old_year = cashflow_list[0]['year']
+	except Exception as e:
+		print("Write excel")
+		print(e)
+		return -1
 
 	if (stock_code != ""):
 		yf.pdr_override()
@@ -605,17 +610,13 @@ def scrape_balance_sheet(balance_sheet_table, year, unit):
 		equity_sum=(	"^자[ \s]*본[ \s]*총[ \s]*계([ \s]*합[ \s]*계)*|\.[ \s]*자[ \s]*본[ \s]*총[ \s]*계([ \s]*합[ \s]*계)*") )
 
 	re_asset_list = []
-	for i in ASSET_LIST.keys():
-		re_asset_list.append(re.compile(ASSET_LIST[i]))
-
 	balance_sheet_sub_list = {}
-	for i in ASSET_LIST.keys():
-		balance_sheet_sub_list[i] = 0.0
-	balance_sheet_sub_list['year'] = year
-
 	balance_sheet_key_list = []
 	for i in ASSET_LIST.keys():
+		re_asset_list.append(re.compile(ASSET_LIST[i]))
+		balance_sheet_sub_list[i] = 0.0
 		balance_sheet_key_list.append(i)
+	balance_sheet_sub_list['year'] = year
 
 	trs = balance_sheet_table.findAll("tr")
 
@@ -723,170 +724,51 @@ def scrape_balance_sheet(balance_sheet_table, year, unit):
 def scrape_cashflows(cashflow_table, year, unit):
 
 	error_cashflows_list = []
-	re_cashflow_list = []
 
 	# Regular expression
-	re_op_cashflow			= re.compile("((영업활동)|(영업활동으로[ \s]*인한)|(영업활동으로부터의))[ \s]*([순]*현금[ \s]*흐름)")
-	re_op_cashflow_sub1 	= re.compile("((영업에서)|(영업으로부터))[ \s]*창출된[ \s]*현금(흐름)*")
-	re_op_cashflow_sub2 	= re.compile("(연[ \s]*결[ \s]*)*당[ \s]*기[ \s]*순[ \s]*((이[ \s]*익)|(손[ \s]*익))")
-	re_op_cashflow_sub3 	= re.compile("감[ \s]*가[ \s]*상[ \s]*각[ \s]*비")
-	re_op_cashflow_sub4 	= re.compile("신[ \s]*탁[ \s]*계[ \s]*정[ \s]*대")
+	CASHFLOW_LIST = dict(
+	op_cashflow			= ("((영업활동)|(영업활동으로[ \s]*인한)|(영업활동으로부터의))[ \s]*([순]*현금[ \s]*흐름)"),
+	op_cashflow_sub1 	= ("((영업에서)|(영업으로부터))[ \s]*창출된[ \s]*현금(흐름)*"),
+	op_cashflow_sub2 	= ("(연[ \s]*결[ \s]*)*당[ \s]*기[ \s]*순[ \s]*((이[ \s]*익)|(손[ \s]*익))"),
+	op_cashflow_sub3 	= ("감[ \s]*가[ \s]*상[ \s]*각[ \s]*비"),
+	op_cashflow_sub4 	= ("신[ \s]*탁[ \s]*계[ \s]*정[ \s]*대"),
 
-	re_invest_cashflow		= re.compile("투자[ \s]*활동[ \s]*현금[ \s]*흐름|투[ \s]*자[ \s]*활[ \s]*동[ \s]*으[ \s]*로[ \s]*인[ \s]*한[ \s]*[순]*현[ \s]*금[ \s]*흐[ \s]*름")
-	re_invest_cashflow_sub1 = re.compile("유[ \s]*형[ \s]*자[ \s]*산[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))")
-	re_invest_cashflow_sub2 = re.compile("무[ \s]*형[ \s]*자[ \s]*산[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))")
-	re_invest_cashflow_sub3 = re.compile("토[ \s]*지[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))")
-	re_invest_cashflow_sub4 = re.compile("건[ \s]*물[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))")
-	re_invest_cashflow_sub5 = re.compile("구[ \s]*축[ \s]*물[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))")
-	re_invest_cashflow_sub6 = re.compile("기[ \s]*계[ \s]*장[ \s]*치[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))")
-	re_invest_cashflow_sub7 = re.compile("건[ \s]*설[ \s]*중[ \s]*인[ \s]*자[ \s]*산[ \s]*의[ \s]*((증[ \s]*가)|(취[ \s]*득))")
-	re_invest_cashflow_sub8 = re.compile("차[ \s]*량[ \s]*운[ \s]*반[ \s]*구[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))")
-	re_invest_cashflow_sub9 = re.compile("비[ \s]*품[ \s]*의[ \s]*취[ \s]*득|비[ \s]*품[ \s]*의[ \s]*((증[ \s]*가)|(취[ \s]*득))")
-	re_invest_cashflow_sub10= re.compile("공[ \s]*구[ \s]*기[ \s]*구[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))")
-	re_invest_cashflow_sub11= re.compile("시[ \s]*험[ \s]*연[ \s]*구[ \s]*설[ \s]*비[ \s]*의[ \s]*취[ \s]*득")
-	re_invest_cashflow_sub12= re.compile("렌[ \s]*탈[ \s]*자[ \s]*산[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))")
-	re_invest_cashflow_sub13= re.compile("영[ \s]*업[ \s]*권[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))")
-	re_invest_cashflow_sub14= re.compile("산[ \s]*업[ \s]*재[ \s]*산[ \s]*권[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))")
-	re_invest_cashflow_sub15= re.compile("소[ \s]*프[ \s]*트[ \s]*웨[ \s]*어[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))")
-	re_invest_cashflow_sub16= re.compile("기[ \s]*타[ \s]*무[ \s]*형[ \s]*자[ \s]*산[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))")
-	re_invest_cashflow_sub17= re.compile("투[ \s]*자[ \s]*부[ \s]*통[ \s]*산[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))")
-	re_invest_cashflow_sub18= re.compile("관[ \s]*계[ \s]*기[ \s]*업[ \s]*투[ \s]*자[ \s]*의[ \s]*취[ \s]*득|관계[ \s]*기업[ \s]*투자[ \s]*주식의[ \s]*취득|지분법[ \s]*적용[ \s]*투자[ \s]*주식의[ \s]*취득")
+	invest_cashflow		= ("투자[ \s]*활동[ \s]*현금[ \s]*흐름|투[ \s]*자[ \s]*활[ \s]*동[ \s]*으[ \s]*로[ \s]*인[ \s]*한[ \s]*[순]*현[ \s]*금[ \s]*흐[ \s]*름"),
+	invest_cashflow_sub1 = ("유[ \s]*형[ \s]*자[ \s]*산[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))"),
+	invest_cashflow_sub2 = ("무[ \s]*형[ \s]*자[ \s]*산[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))"),
+	invest_cashflow_sub3 = ("토[ \s]*지[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))"),
+	invest_cashflow_sub4 = ("건[ \s]*물[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))"),
+	invest_cashflow_sub5 = ("구[ \s]*축[ \s]*물[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))"),
+	invest_cashflow_sub6 = ("기[ \s]*계[ \s]*장[ \s]*치[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))"),
+	invest_cashflow_sub7 = ("건[ \s]*설[ \s]*중[ \s]*인[ \s]*자[ \s]*산[ \s]*의[ \s]*((증[ \s]*가)|(취[ \s]*득))"),
+	invest_cashflow_sub8 = ("차[ \s]*량[ \s]*운[ \s]*반[ \s]*구[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))"),
+	invest_cashflow_sub9 = ("비[ \s]*품[ \s]*의[ \s]*취[ \s]*득|비[ \s]*품[ \s]*의[ \s]*((증[ \s]*가)|(취[ \s]*득))"),
+	invest_cashflow_sub10= ("공[ \s]*구[ \s]*기[ \s]*구[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))"),
+	invest_cashflow_sub11= ("시[ \s]*험[ \s]*연[ \s]*구[ \s]*설[ \s]*비[ \s]*의[ \s]*취[ \s]*득"),
+	invest_cashflow_sub12= ("렌[ \s]*탈[ \s]*자[ \s]*산[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))"),
+	invest_cashflow_sub13= ("영[ \s]*업[ \s]*권[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))"),
+	invest_cashflow_sub14= ("산[ \s]*업[ \s]*재[ \s]*산[ \s]*권[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))"),
+	invest_cashflow_sub15= ("소[ \s]*프[ \s]*트[ \s]*웨[ \s]*어[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))"),
+	invest_cashflow_sub16= ("기[ \s]*타[ \s]*무[ \s]*형[ \s]*자[ \s]*산[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))"),
+	invest_cashflow_sub17= ("투[ \s]*자[ \s]*부[ \s]*통[ \s]*산[ \s]*의[ \s]*((취[ \s]*득)|(증[ \s]*가))"),
+	invest_cashflow_sub18= ("관[ \s]*계[ \s]*기[ \s]*업[ \s]*투[ \s]*자[ \s]*의[ \s]*취[ \s]*득|관계[ \s]*기업[ \s]*투자[ \s]*주식의[ \s]*취득|지분법[ \s]*적용[ \s]*투자[ \s]*주식의[ \s]*취득"),
 
-	re_fin_cashflow			= re.compile("재무[ \s]*활동[ \s]*현금[ \s]*흐름|재무활동으로[ \s]*인한[ \s]*현금흐름")
-	re_fin_cashflow_sub1	= re.compile("단기차입금의[ \s]*순증가")
-	re_fin_cashflow_sub2	= re.compile("배당금[ \s]*지급|현금배당금의[ \s]*지급|배당금의[ \s]*지급|현금배당|보통주[ ]*배당[ ]*지급")
-	re_fin_cashflow_sub3	= re.compile("자기주식의[ \s]*취득")
-	re_start_cash			= re.compile("기초[ ]*현금[ ]*및[ ]*현금성[ ]*자산|기초의[ \s]*현금[ ]*및[ ]*현금성[ ]*자산|기[ \s]*초[ \s]*의[ \s]*현[ \s]*금|기[ \s]*초[ \s]*현[ \s]*금")
-	re_end_cash				= re.compile("기말[ ]*현금[ ]*및[ ]*현금성[ ]*자산|기말의[ \s]*현금[ ]*및[ ]*현금성[ ]*자산|기[ \s]*말[ \s]*의[ \s]*현[ \s]*금|기[ \s]*말[ \s]*현[ \s]*금")
+	fin_cashflow		= ("재무[ \s]*활동[ \s]*현금[ \s]*흐름|재무활동으로[ \s]*인한[ \s]*현금흐름"),
+	fin_cashflow_sub1	= ("단기차입금의[ \s]*순증가"),
+	fin_cashflow_sub2	= ("배당금[ \s]*지급|현금배당금의[ \s]*지급|배당금의[ \s]*지급|현금배당|보통주[ ]*배당[ ]*지급"),
+	fin_cashflow_sub3	= ("자기주식의[ \s]*취득"),
+	start_cash			= ("기초[ ]*현금[ ]*및[ ]*현금성[ ]*자산|기초의[ \s]*현금[ ]*및[ ]*현금성[ ]*자산|기[ \s]*초[ \s]*의[ \s]*현[ \s]*금|기[ \s]*초[ \s]*현[ \s]*금"),
+	end_cash			= ("기말[ ]*현금[ ]*및[ ]*현금성[ ]*자산|기말의[ \s]*현금[ ]*및[ ]*현금성[ ]*자산|기[ \s]*말[ \s]*의[ \s]*현[ \s]*금|기[ \s]*말[ \s]*현[ \s]*금"),
+	)
 
-	re_cashflow_list.append(re_op_cashflow)
-	re_cashflow_list.append(re_op_cashflow_sub1)
-	re_cashflow_list.append(re_op_cashflow_sub2)
-	re_cashflow_list.append(re_op_cashflow_sub3)
-	re_cashflow_list.append(re_op_cashflow_sub4)
-
-	re_cashflow_list.append(re_invest_cashflow)
-	re_cashflow_list.append(re_invest_cashflow_sub1)
-	re_cashflow_list.append(re_invest_cashflow_sub2)
-	re_cashflow_list.append(re_invest_cashflow_sub3)
-	re_cashflow_list.append(re_invest_cashflow_sub4)
-	re_cashflow_list.append(re_invest_cashflow_sub5)
-	re_cashflow_list.append(re_invest_cashflow_sub6)
-	re_cashflow_list.append(re_invest_cashflow_sub7)
-	re_cashflow_list.append(re_invest_cashflow_sub8)
-	re_cashflow_list.append(re_invest_cashflow_sub9)
-	re_cashflow_list.append(re_invest_cashflow_sub10)
-	re_cashflow_list.append(re_invest_cashflow_sub11)
-	re_cashflow_list.append(re_invest_cashflow_sub12)
-	re_cashflow_list.append(re_invest_cashflow_sub13)
-	re_cashflow_list.append(re_invest_cashflow_sub14)
-	re_cashflow_list.append(re_invest_cashflow_sub15)
-	re_cashflow_list.append(re_invest_cashflow_sub16)
-	re_cashflow_list.append(re_invest_cashflow_sub17)
-	re_cashflow_list.append(re_invest_cashflow_sub18)
-
-	re_cashflow_list.append(re_fin_cashflow)
-	re_cashflow_list.append(re_fin_cashflow_sub1)
-	re_cashflow_list.append(re_fin_cashflow_sub2)
-	re_cashflow_list.append(re_fin_cashflow_sub3)
-	re_cashflow_list.append(re_start_cash)
-	re_cashflow_list.append(re_end_cash)
-
-
-	# 영업현금흐름
-	## 영업에서 창출된 현금흐름
-	## 당기순이익
-	## 신탁계정대
-	# 투자현금흐름
-	## 유형자산의 취득
-	## 무형자산의 취득
-	## 토지의 취득
-	## 건물의 취득
-	## 구축물의 취득
-	## 기계장치의 취득
-	## 건설중인자산의증가
-	## 차량운반구의 취득
-	## 영업권의 취득
-	## 산업재산권의 취득
-	## 기타의무형자산의취득
-	## 투자부동산의 취득
-	## 관계기업투자의취득
-	# 재무현금흐름
-	## 단기차입금의 순증가
-	## 배당금 지급
-	## 자기주식의 취득
-	# 기초 현금 및 현금성자산
-	# 기말 현금 및 현금성자산
-
+	re_cashflow_list = []
 	cashflow_sub_list = {}
-
-	cashflow_sub_list['year']					= year
-	cashflow_sub_list["op_cashflow"]			= 0.0
-	cashflow_sub_list["op_cashflow_sub1"]		= 0.0
-	cashflow_sub_list["op_cashflow_sub2"]		= 0.0
-	cashflow_sub_list["op_cashflow_sub3"]		= 0.0
-	cashflow_sub_list["op_cashflow_sub4"]		= 0.0
-	cashflow_sub_list["invest_cashflow"]		= 0.0
-	cashflow_sub_list["invest_cashflow_sub1"]	= 0.0
-	cashflow_sub_list["invest_cashflow_sub2"]	= 0.0
-	cashflow_sub_list["invest_cashflow_sub3"]	= 0.0
-	cashflow_sub_list["invest_cashflow_sub4"]	= 0.0
-	cashflow_sub_list["invest_cashflow_sub5"]	= 0.0
-	cashflow_sub_list["invest_cashflow_sub6"]	= 0.0
-	cashflow_sub_list["invest_cashflow_sub7"]	= 0.0
-	cashflow_sub_list["invest_cashflow_sub8"]	= 0.0
-	cashflow_sub_list["invest_cashflow_sub9"]	= 0.0
-	cashflow_sub_list["invest_cashflow_sub10"]	= 0.0
-	cashflow_sub_list["invest_cashflow_sub11"]	= 0.0
-	cashflow_sub_list["invest_cashflow_sub12"]	= 0.0
-	cashflow_sub_list["invest_cashflow_sub13"]	= 0.0
-	cashflow_sub_list["invest_cashflow_sub14"]	= 0.0
-	cashflow_sub_list["invest_cashflow_sub15"]	= 0.0
-	cashflow_sub_list["invest_cashflow_sub16"]	= 0.0
-	cashflow_sub_list["invest_cashflow_sub17"]	= 0.0
-	cashflow_sub_list["invest_cashflow_sub18"]	= 0.0
-	cashflow_sub_list["fin_cashflow"]			= 0.0
-	cashflow_sub_list["fin_cashflow_sub1"]		= 0.0
-	cashflow_sub_list["fin_cashflow_sub2"]		= 0.0
-	cashflow_sub_list["fin_cashflow_sub3"]		= 0.0
-	cashflow_sub_list["start_cash"]				= 0.0
-	cashflow_sub_list["end_cash"]				= 0.0
-
 	cashflow_key_list = []
-
-	cashflow_key_list.append("op_cashflow")
-	cashflow_key_list.append("op_cashflow_sub1")
-	cashflow_key_list.append("op_cashflow_sub2")
-	cashflow_key_list.append("op_cashflow_sub3")
-	cashflow_key_list.append("op_cashflow_sub4")
-	cashflow_key_list.append("invest_cashflow")
-	cashflow_key_list.append("invest_cashflow_sub1")
-	cashflow_key_list.append("invest_cashflow_sub2")
-	cashflow_key_list.append("invest_cashflow_sub3")
-	cashflow_key_list.append("invest_cashflow_sub4")
-	cashflow_key_list.append("invest_cashflow_sub5")
-	cashflow_key_list.append("invest_cashflow_sub6")
-	cashflow_key_list.append("invest_cashflow_sub7")
-	cashflow_key_list.append("invest_cashflow_sub8")
-	cashflow_key_list.append("invest_cashflow_sub9")
-	cashflow_key_list.append("invest_cashflow_sub10")
-	cashflow_key_list.append("invest_cashflow_sub11")
-	cashflow_key_list.append("invest_cashflow_sub12")
-	cashflow_key_list.append("invest_cashflow_sub13")
-	cashflow_key_list.append("invest_cashflow_sub14")
-	cashflow_key_list.append("invest_cashflow_sub15")
-	cashflow_key_list.append("invest_cashflow_sub16")
-	cashflow_key_list.append("invest_cashflow_sub17")
-	cashflow_key_list.append("invest_cashflow_sub18")
-	cashflow_key_list.append("fin_cashflow")
-	cashflow_key_list.append("fin_cashflow_sub1")
-	cashflow_key_list.append("fin_cashflow_sub2")
-	cashflow_key_list.append("fin_cashflow_sub3")
-	cashflow_key_list.append("start_cash")
-	cashflow_key_list.append("end_cash")
-
-	#net_income = 0.0
-	#print("len(trs)", len(trs))
+	for i in CASHFLOW_LIST.keys():
+		re_cashflow_list.append(re.compile(CASHFLOW_LIST[i]))
+		cashflow_sub_list[i] = 0.0
+		cashflow_key_list.append(i)
+	cashflow_sub_list['year']					= year
 
 	trs = cashflow_table.findAll("tr")
 
@@ -1011,83 +893,33 @@ def scrape_income_statement(income_table, year, unit, mode):
 	#당기순이익
 	#기본주당이익
 
+	INCOME_LIST = dict(
+	sales			=	("^매[ \s]*출[ \s]*액|\.[ \s]*매[ \s]*출[ \s]*액|\(매출액\)"),
+	sales_sub1		= 	("^매[ \s]*출[ \s]*원[ \s]*가|\.[ \s]*매[ \s]*출[ \s]*원[ \s]*가"),
+	sales_sub2		= 	("^매[ \s]*출[ \s]*총[ \s]*이[ \s]*익|\.[ \s]*매[ \s]*출[ \s]*총[ \s]*이[ \s]*익"),
+	sales_sub3		= 	("판[ \s]*매[ \s]*비[ \s]*와[ \s]*관[ \s]*리[ \s]*비"),
+	sales2			=	("^영[ \s]*업[ \s]*수[ \s]*익|\.[ \s]*영[ \s]*업[ \s]*수[ \s]*익"),
+	sales2_sub1		= 	("^영[ \s]*업[ \s]*비[ \s]*용|\.[ \s]*영[ \s]*업[ \s]*비[ \s]*용"),
+	op_income		= 	("^영[ \s]*업[ \s]*이[ \s]*익|\.[ \s]*영[ \s]*업[ \s]*이[ \s]*익"),
+	op_income_sub1	= 	("기[ \s]*타[ \s]*수[ \s]*익"),
+	op_income_sub2	= 	("기[ \s]*타[ \s]*비[ \s]*용"),
+	op_income_sub3	= 	("금[ \s]*융[ \s]*수[ \s]*익"),
+	op_income_sub4	= 	("금[ \s]*융[ \s]*비[ \s]*용"),
+	op_income_sub6	= 	("영[ \s]*업[ \s]*외[ \s]*수[ \s]*익"),
+	op_income_sub7	= 	("영[ \s]*업[ \s]*외[ \s]*비[ \s]*용"),
+	op_income_sub5	= 	("법[ \s]*인[ \s]*세[ \s]*비[ \s]*용[ \s]*차[ \s]*감[ \s]*전[ \s]*순[ \s]*((이[ \s]*익)|(손[ \s]*실))|법[ \s]*인[ \s]*세[ \s]*차[ \s]*감[ \s]*전[ \s]*계[ \s]*속[ \s]*영[ \s]*업[ \s]*순[ \s]*이[ \s]*익|법인세[ \s]*차감전[ \s]*순이익|법인세차감전계속영업이익|법인세비용차감전이익|법인세비용차감전계속영업[순]*이익|법인세비용차감전당기순이익|법인세비용차감전순이익|법인세비용차감전[ \s]*계속사업이익|법인세비용차감전순손익"),
+	tax				=	("법[ \s]*인[ \s]*세[ \s]*비[ \s]*용"),
+	net_income		=	("^순[ \s]*이[ \s]*익|^당[ \s]*기[ \s]*순[ \s]*이[ \s]*익|^연[ ]*결[ ]*[총 ]*당[ ]*기[ ]*순[ ]*이[ ]*익|지배기업의 소유주에게 귀속되는 당기순이익|분기순이익|당\(분\)기순이익|\.[ \s]*당[ \s]*기[ \s]*순[ \s]*이[ \s]*익|당분기연결순이익"),
+	eps				=	("기[ \s]*본[ \s]*주[ \s]*당[ \s]*((수[ \s]*익)|([순 \s]*이[ \s]*익))") )
+
 	re_income_list = []
-
-	# Regular expression
-	re_sales			=	re.compile("^매[ \s]*출[ \s]*액|\.[ \s]*매[ \s]*출[ \s]*액|\(매출액\)")
-	re_sales_sub1		= 	re.compile("^매[ \s]*출[ \s]*원[ \s]*가|\.[ \s]*매[ \s]*출[ \s]*원[ \s]*가")
-	re_sales_sub2		= 	re.compile("^매[ \s]*출[ \s]*총[ \s]*이[ \s]*익|\.[ \s]*매[ \s]*출[ \s]*총[ \s]*이[ \s]*익")
-	re_sales_sub3		= 	re.compile("판[ \s]*매[ \s]*비[ \s]*와[ \s]*관[ \s]*리[ \s]*비")
-	re_sales2			=	re.compile("^영[ \s]*업[ \s]*수[ \s]*익|\.[ \s]*영[ \s]*업[ \s]*수[ \s]*익")
-	re_sales2_sub1		= 	re.compile("^영[ \s]*업[ \s]*비[ \s]*용|\.[ \s]*영[ \s]*업[ \s]*비[ \s]*용")
-	re_op_income		= 	re.compile("^영[ \s]*업[ \s]*이[ \s]*익|\.[ \s]*영[ \s]*업[ \s]*이[ \s]*익")
-	re_op_income_sub1	= 	re.compile("기[ \s]*타[ \s]*수[ \s]*익")
-	re_op_income_sub2	= 	re.compile("기[ \s]*타[ \s]*비[ \s]*용")
-	re_op_income_sub3	= 	re.compile("금[ \s]*융[ \s]*수[ \s]*익")
-	re_op_income_sub4	= 	re.compile("금[ \s]*융[ \s]*비[ \s]*용")
-	re_op_income_sub6	= 	re.compile("영[ \s]*업[ \s]*외[ \s]*수[ \s]*익")
-	re_op_income_sub7	= 	re.compile("영[ \s]*업[ \s]*외[ \s]*비[ \s]*용")
-	re_op_income_sub5	= 	re.compile("법[ \s]*인[ \s]*세[ \s]*비[ \s]*용[ \s]*차[ \s]*감[ \s]*전[ \s]*순[ \s]*((이[ \s]*익)|(손[ \s]*실))|법[ \s]*인[ \s]*세[ \s]*차[ \s]*감[ \s]*전[ \s]*계[ \s]*속[ \s]*영[ \s]*업[ \s]*순[ \s]*이[ \s]*익|법인세[ \s]*차감전[ \s]*순이익|법인세차감전계속영업이익|법인세비용차감전이익|법인세비용차감전계속영업[순]*이익|법인세비용차감전당기순이익|법인세비용차감전순이익|법인세비용차감전[ \s]*계속사업이익|법인세비용차감전순손익")
-	re_tax				=	re.compile("법[ \s]*인[ \s]*세[ \s]*비[ \s]*용")
-	re_net_income		=	re.compile("^순[ \s]*이[ \s]*익|^당[ \s]*기[ \s]*순[ \s]*이[ \s]*익|^연[ ]*결[ ]*[총 ]*당[ ]*기[ ]*순[ ]*이[ ]*익|지배기업의 소유주에게 귀속되는 당기순이익|분기순이익|당\(분\)기순이익|\.[ \s]*당[ \s]*기[ \s]*순[ \s]*이[ \s]*익|당분기연결순이익")
-	re_eps				=	re.compile("기[ \s]*본[ \s]*주[ \s]*당[ \s]*((수[ \s]*익)|([순 \s]*이[ \s]*익))")
-
-	re_income_list.append(re_sales)
-	re_income_list.append(re_sales_sub1)
-	re_income_list.append(re_sales_sub2)
-	re_income_list.append(re_sales_sub3)
-	re_income_list.append(re_sales2)
-	re_income_list.append(re_sales2_sub1)
-	re_income_list.append(re_op_income)
-	re_income_list.append(re_op_income_sub1)
-	re_income_list.append(re_op_income_sub2)
-	re_income_list.append(re_op_income_sub3)
-	re_income_list.append(re_op_income_sub4)
-	re_income_list.append(re_op_income_sub5)
-	re_income_list.append(re_op_income_sub6)
-	re_income_list.append(re_op_income_sub7)
-	re_income_list.append(re_tax)
-	re_income_list.append(re_net_income)
-	re_income_list.append(re_eps)
-
 	income_statement_sub_list = {}
-	income_statement_sub_list["sales"]				=	0.0
-	income_statement_sub_list["sales_sub1"]			=	0.0
-	income_statement_sub_list["sales_sub2"]			=	0.0
-	income_statement_sub_list["sales_sub3"]			=	0.0
-	income_statement_sub_list["sales2"]				=	0.0
-	income_statement_sub_list["sales2_sub1"]		=	0.0
-	income_statement_sub_list["op_income"]		 	=	0.0
-	income_statement_sub_list["op_income_sub1"]		=	0.0
-	income_statement_sub_list["op_income_sub2"]		=	0.0
-	income_statement_sub_list["op_income_sub3"]		=	0.0
-	income_statement_sub_list["op_income_sub4"]		=	0.0
-	income_statement_sub_list["op_income_sub5"]		=	0.0
-	income_statement_sub_list["op_income_sub6"]		=	0.0
-	income_statement_sub_list["op_income_sub7"]		=	0.0
-	income_statement_sub_list["tax"]				=	0.0
-	income_statement_sub_list["net_income"]			=	0.0
-	income_statement_sub_list["eps"]				=	0.0
-	income_statement_sub_list['year']				=	year
-
 	income_statement_key_list = []
-	income_statement_key_list.append("sales")
-	income_statement_key_list.append("sales_sub1")
-	income_statement_key_list.append("sales_sub2")
-	income_statement_key_list.append("sales_sub3")
-	income_statement_key_list.append("sales2")
-	income_statement_key_list.append("sales2_sub1")
-	income_statement_key_list.append("op_income")
-	income_statement_key_list.append("op_income_sub1")
-	income_statement_key_list.append("op_income_sub2")
-	income_statement_key_list.append("op_income_sub3")
-	income_statement_key_list.append("op_income_sub4")
-	income_statement_key_list.append("op_income_sub5")
-	income_statement_key_list.append("op_income_sub6")
-	income_statement_key_list.append("op_income_sub7")
-	income_statement_key_list.append("tax")
-	income_statement_key_list.append("net_income")
-	income_statement_key_list.append("eps")
+	for i in INCOME_LIST.keys():
+		re_income_list.append(re.compile(INCOME_LIST[i]))
+		income_statement_sub_list[i]				=	0.0
+		income_statement_key_list.append(i)
+	income_statement_sub_list['year']				=	year
 
 	trs = income_table.findAll("tr")
 
