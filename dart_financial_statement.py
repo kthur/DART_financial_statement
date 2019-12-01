@@ -525,6 +525,8 @@ def write_excel_file(workbook_name, dart_post_list, cashflow_list, balance_sheet
 		stock_close = stock_read['Close'].values
 		stock_datetime64 = stock_read.index.values
 
+
+
 		stock_date = []
 
 		for date in stock_datetime64:
@@ -541,8 +543,8 @@ def write_excel_file(workbook_name, dart_post_list, cashflow_list, balance_sheet
 		worksheet_stock.write(0, 1, "Close")
 
 		for i in range(len(stock_close)):
-			worksheet_stock.write(i+1, 0, stock_date[i])
-			worksheet_stock.write(i+1, 1, stock_close[i])
+			worksheet_stock.write(i + 1, 0, stock_date[i])
+			worksheet_stock.write(i + 1, 1, stock_close[i])
 
 		chart = workbook.add_chart({'type':'line'})
 		chart.add_series({
@@ -1096,14 +1098,13 @@ def main(corp = "삼성전자"):
 		elif option == "--output" or option == "-o":
 			workbook_name = argument + ".xlsx"
 
+	stock_code, stock_cat = get_corp_code(corp)
+	workbook_name = "all/" + stock_cat + "_" + stock_code + "_" + corp + ".xlsx"
 
 	re_income_find = re.compile("법[ \s]*인[ \s]*세[ \s]*비[ \s]*용(\(이익\))*[ \s]*차[ \s]*감[ \s]*전[ \s]*순[ \s]*((이[ \s]*익)|(손[ \s]*실))|법[ \s]*인[ \s]*세[ \s]*차[ \s]*감[ \s]*전[ \s]*계[ \s]*속[ \s]*영[ \s]*업[ \s]*순[ \s]*이[ \s]*익|법인세[ \s]*차감전[ \s]*순이익|법인세차감전계속영업이익|법인세비용차감전이익|법인세비용차감전계속영업[순]*이익|법인세비용차감전당기순이익|법인세(비용차감|손익가감)전순이익|법인세비용차감전[ \s]*계속사업이익|법인세비용차감전순손익")
 	re_cashflow_find = re.compile("영업활동[ \s]*현금[ \s]*흐름|영업활동으로[ \s]*인한[ \s]*[순]*현금[ \s]*흐름|영업활동으로부터의[ \s]*현금흐름|영업활동으로 인한 자산부채의 변동")
 	re_balance_sheet_find = re.compile("현[ \s]*금[ \s]*및[ \s]*현[ \s]*금[ \s]*((성[ \s]*자[ \s]*산)|(등[ \s]*가[ \s]*물))")
 
-	stock_code, stock_cat = get_corp_code(corp)
-
-	workbook_name = "all/" + stock_cat + "_" + stock_code + "_" + corp + ".xlsx"
 	# URL
 	#url_templete = "http://dart.fss.or.kr/dsab002/search.ax?reportName=%s&&maxResults=100&&textCrpNm=%s"
 	url_templete = "http://dart.fss.or.kr/dsab002/search.ax?reportName=%s&&maxResults=100&&textCrpNm=%s&&startDate=%s&&endDate=%s"
@@ -1114,21 +1115,18 @@ def main(corp = "삼성전자"):
 	balance_sheet_list = []
 	income_statement_list = []
 
-	year = datetime.today().year
-	start_day = datetime(2005,1,1)
-	end_day = datetime.today()
+
 
 	# http://coderstoolbox.net/string/#!encoding=url&action=encode&charset=utf_8
-	# 사업보고서
-	report_year = "%EC%82%AC%EC%97%85%EB%B3%B4%EA%B3%A0%EC%84%9C"
-	# 반기보고서
-	report_half = "%EB%B0%98%EA%B8%B0%EB%B3%B4%EA%B3%A0%EC%84%9C"
-	# 분기보고서
-	report_quarter = "%EB%B6%84%EA%B8%B0%EB%B3%B4%EA%B3%A0%EC%84%9C" 
+
+	REPORT_LIST = dict (
+		report_year = "%EC%82%AC%EC%97%85%EB%B3%B4%EA%B3%A0%EC%84%9C", # 사업보고서
+		report_half = "%EB%B0%98%EA%B8%B0%EB%B3%B4%EA%B3%A0%EC%84%9C",	# 반기보고서
+		report_quarter = "%EB%B6%84%EA%B8%B0%EB%B3%B4%EA%B3%A0%EC%84%9C" # 분기보고서
+	)
 
 	# 최신 분기보고서 읽기
-	handle = urllib.request.urlopen(url_templete % (report_year, urllib.parse.quote(corp), (datetime.today() - timedelta(days=90)).strftime('%Y%m%d'), datetime.today().strftime('%Y%m%d')))
-#	print(url_templete % (report_year, urllib.parse.quote(corp), start_day2.strftime('%Y%m%d'), end_day2.strftime('%Y%m%d')))
+	handle = urllib.request.urlopen(url_templete % (REPORT_LIST["report_quarter"], urllib.parse.quote(corp), (datetime.today() - timedelta(days=90)).strftime('%Y%m%d'), datetime.today().strftime('%Y%m%d')))
 
 	data = handle.read()
 	soup = BeautifulSoup(data, 'html.parser', from_encoding='utf-8')
@@ -1433,10 +1431,12 @@ def main(corp = "삼성전자"):
 		balance_sheet_list.append(balance_sheet_sub_list)
 		income_statement_list.append(income_statement_sub_list)
 
-	#handle = urllib.request.urlopen(url_templete % (report, urllib.parse.quote(corp)))
-	#print("URL" + url_templete % (report, corp))
-	handle = urllib.request.urlopen(url_templete % (report_year, urllib.parse.quote(corp), start_day.strftime('%Y%m%d'), end_day.strftime('%Y%m%d')))
-	print("URL", url_templete % (report_year, corp, start_day.strftime('%Y%m%d'), end_day.strftime('%Y%m%d')))
+	year = datetime.today().year
+	start_day = datetime(2005,1,1)
+	end_day = datetime.today()
+
+	handle = urllib.request.urlopen(url_templete % (REPORT_LIST["report_year"], urllib.parse.quote(corp), start_day.strftime('%Y%m%d'), end_day.strftime('%Y%m%d')))
+	print("URL", url_templete % (REPORT_LIST["report_year"], corp, start_day.strftime('%Y%m%d'), end_day.strftime('%Y%m%d')))
 
 	data = handle.read()
 	soup = BeautifulSoup(data, 'html.parser', from_encoding='utf-8')
@@ -1821,7 +1821,7 @@ if __name__ == "__main__":
 	workbook_read = xlrd.open_workbook(os.path.join(cur_dir, workbook_read_name))
 	sheet_list = workbook_read.sheets()
 	sheet1 = sheet_list[0]
-	for i in range(77, num_stock):
+	for i in range(85, num_stock):
 		#t1 = threading.Thread(target=main, args=(sheet1.cell(i + 1, 1).value))
 		#t1.start()
 		print("number", i, sheet1.cell(i + 1, 0).value, sheet1.cell(i + 1, 1).value, sheet1.cell(i + 1, 2).value, sheet1.cell(i + 1, 3).value)
