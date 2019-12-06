@@ -16,7 +16,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 
-
 # Scrape value
 def find_value(text, unit):
 	return int(text.replace(" ","").replace("△","-").replace("(-)","-").replace("(","-").replace(")","").replace(",","").replace("=",""))/unit
@@ -76,7 +75,7 @@ def write_excel_file(workbook_name, dart_post_list, cashflow_list, balance_sheet
 	#workbook = xlsxwriter.Workbook(workbook_name)
 	#if os.path.isfile(os.path.join(cur_dir, workbook_name)):
 	#	os.remove(os.path.join(cur_dir, workbook_name))
-	workbook = xlsxwriter.Workbook(workbook_name)
+	workbook = xlsxwriter.Workbook(workbook_name, {'nan_inf_to_errors': True})
 
 	worksheet_result = workbook.add_worksheet('DART사업보고서')
 	filter_format_color = workbook.add_format({'bold':True, 'fg_color': '#D7E4BC'})
@@ -525,8 +524,6 @@ def write_excel_file(workbook_name, dart_post_list, cashflow_list, balance_sheet
 		stock_close = stock_read['Close'].values
 		stock_datetime64 = stock_read.index.values
 
-
-
 		stock_date = []
 
 		for date in stock_datetime64:
@@ -688,11 +685,11 @@ def scrape_balance_sheet(balance_sheet_table, year, unit):
 				prev = 0
 
 		print("##################################################")
-		print(index_col)
-		print(data_col)
-		print(data_col2)
-		print(len(index_col))
-		print(len(data_col))
+#		print(index_col)
+#		print(data_col)
+#		print(data_col2)
+#		print(len(index_col))
+#		print(len(data_col))
 		index_cnt = 0
 
 		for (index) in (index_col):
@@ -718,7 +715,7 @@ def scrape_balance_sheet(balance_sheet_table, year, unit):
 				print(e)
 			index_cnt = index_cnt + 1
 
-	print(balance_sheet_sub_list)
+#	print(balance_sheet_sub_list)
 	return balance_sheet_sub_list
 
 
@@ -874,8 +871,8 @@ def scrape_cashflows(cashflow_table, year, unit):
 				print(e)
 			index_cnt = index_cnt + 1
 
-	print(cashflow_sub_list)
-	print(error_cashflows_list)
+#	print(cashflow_sub_list)
+#	print(error_cashflows_list)
 	return cashflow_sub_list
 
 # Get information of income statements
@@ -1115,8 +1112,6 @@ def main(corp = "삼성전자"):
 	balance_sheet_list = []
 	income_statement_list = []
 
-
-
 	# http://coderstoolbox.net/string/#!encoding=url&action=encode&charset=utf_8
 
 	REPORT_LIST = dict (
@@ -1337,7 +1332,7 @@ def main(corp = "삼성전자"):
 		else:
 			print("FINDING LINE NUMBER ERROR")
 			cashflow_sub_list = {}
-			
+
 			cashflow_sub_list['year']				= 2017
 			cashflow_sub_list['op_cashflow']		= 0.0
 			cashflow_sub_list['op_cashflow_sub1']	= "FINDING LINE NUMBER ERROR"
@@ -1362,7 +1357,7 @@ def main(corp = "삼성전자"):
 			cashflow_sub_list['invest_cashflow_sub16'] 	= 0.0
 			cashflow_sub_list['invest_cashflow_sub17'] 	= 0.0
 			cashflow_sub_list['invest_cashflow_sub18'] 	= 0.0
-			
+
 			cashflow_sub_list['fin_cashflow']		= 0.0
 			cashflow_sub_list['fin_cashflow_sub1']	= 0.0
 			cashflow_sub_list['fin_cashflow_sub2'] 	= 0.0
@@ -1371,7 +1366,7 @@ def main(corp = "삼성전자"):
 			cashflow_sub_list['start_cash']		= 0.0
 			cashflow_sub_list['end_cash']		= 0.0
 			cashflow_sub_list['net_income']		= 0.0
-			
+
 			#print(cashflow_sub_list)
 
 			balance_sheet_sub_list = {}
@@ -1399,7 +1394,7 @@ def main(corp = "삼성전자"):
 			balance_sheet_sub_list["equity_sub3"]					=	0.0
 			balance_sheet_sub_list["equity_sub2"]					=	0.0
 			balance_sheet_sub_list["equity_sum"]					=	0.0
-					
+
 			income_statement_sub_list = {}
 			income_statement_sub_list['year']				=	2017
 			income_statement_sub_list["sales"]				=	0.0
@@ -1821,7 +1816,7 @@ if __name__ == "__main__":
 	workbook_read = xlrd.open_workbook(os.path.join(cur_dir, workbook_read_name))
 	sheet_list = workbook_read.sheets()
 	sheet1 = sheet_list[0]
-	for i in range(85, num_stock):
+	for i in range(86, num_stock):
 		#t1 = threading.Thread(target=main, args=(sheet1.cell(i + 1, 1).value))
 		#t1.start()
 		print("number", i, sheet1.cell(i + 1, 0).value, sheet1.cell(i + 1, 1).value, sheet1.cell(i + 1, 2).value, sheet1.cell(i + 1, 3).value)
