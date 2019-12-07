@@ -518,8 +518,8 @@ def write_excel_file(workbook_name, dart_post_list, cashflow_list, balance_sheet
 		else:
 			ticker = stock_code+'.KQ'
 
-		print("ticker", ticker)
-		print("start date", start_date)
+#		print("ticker", ticker)
+#		print("start date", start_date)
 		stock_read = pandas_datareader.data.get_data_yahoo(ticker, start_date)
 		stock_close = stock_read['Close'].values
 		stock_datetime64 = stock_read.index.values
@@ -843,8 +843,8 @@ def scrape_cashflows(cashflow_table, year, unit):
 
 		#print(index_col)
 		#print(data_col)
-		print(len(index_col))
-		print(len(data_col))
+#		print(len(index_col))
+#		print(len(data_col))
 		index_cnt = 0
 
 		for (index) in (index_col):
@@ -997,8 +997,8 @@ def scrape_income_statement(income_table, year, unit, mode):
 				prev = 0
 
 
-		print(len(index_col))
-		print(len(data_col))
+#		print(len(index_col))
+#		print(len(data_col))
 		index_cnt = 0
 
 		for (index) in (index_col):
@@ -1024,7 +1024,7 @@ def scrape_income_statement(income_table, year, unit, mode):
 				print(e)
 			index_cnt = index_cnt + 1
 
-	print(income_statement_sub_list)
+#	print(income_statement_sub_list)
 	return income_statement_sub_list
 
 def get_corp_code(corp):
@@ -1220,7 +1220,6 @@ def main(corp = "삼성전자"):
 
 			#try:
 			handle = urllib.request.urlopen(link2)
-			print(handle)
 			data = handle.read()
 			soup3 = BeautifulSoup(data, 'html.parser', from_encoding='utf-8')
 
@@ -1252,7 +1251,6 @@ def main(corp = "삼성전자"):
 				print(link2)
 				
 				handle = urllib.request.urlopen(link2)
-				print(handle)
 				data = handle.read()
 				soup3 = BeautifulSoup(data, 'html.parser', from_encoding='utf-8')
 				tables = soup3.findAll("table")
@@ -1287,7 +1285,7 @@ def main(corp = "삼성전자"):
 					break
 				cnt = cnt + 1
 			balance_table = soup3.findAll("table")[table_balance_num]
-			print("table_balance_num", table_balance_num, "Tables", len(tables))
+#			print("table_balance_num", table_balance_num, "Tables", len(tables))
 			
 			unit = 100.0
 			unit_find = 0
@@ -1426,6 +1424,7 @@ def main(corp = "삼성전자"):
 		balance_sheet_list.append(balance_sheet_sub_list)
 		income_statement_list.append(income_statement_sub_list)
 
+	# 사업보고서
 	year = datetime.today().year
 	start_day = datetime(2005,1,1)
 	end_day = datetime.today()
@@ -1476,9 +1475,7 @@ def main(corp = "삼성전자"):
 				dart_post_sublist = []
 
 				year = int(date[0:4])
-				print(corp_name)
-				print(title)
-				print(date)
+				print(corp_name, title, date)
 				handle = urllib.request.urlopen(link)
 				#print(link)
 				data = handle.read()
@@ -1486,7 +1483,7 @@ def main(corp = "삼성전자"):
 				#print(soup2)
 				
 				#print(type(soup2.find('head').text))
-				head_lines = soup2.find('head').text.split("\n")
+				head_lines: object = soup2.find('head').text.split("\n")
 				#print(head_words)
 
 				# From 2015 ~ now
@@ -1590,7 +1587,7 @@ def main(corp = "삼성전자"):
 					# 2. 연결재무제표가 비어 있는 경우
 					if (len(tables) == 0):
 						line_words = head_lines[line_find_bak+4].split("'")
-						#print(line_words)
+						print(line_words)
 						rcpNo = line_words[1]
 						dcmNo = line_words[3]
 						eleId = line_words[5]
@@ -1699,7 +1696,7 @@ def main(corp = "삼성전자"):
 					cashflow_sub_list = scrape_cashflows(cashflow_table, year-1, unit)
 					income_statement_sub_list = scrape_income_statement(income_table, year-1, unit, 0)
 					balance_sheet_sub_list = scrape_balance_sheet(balance_table, year-1, unit)
-					print(cashflow_sub_list)
+#					print(cashflow_sub_list)
 					
 					cashflow_sub_list['net_income'] = income_statement_sub_list['net_income']
 
@@ -1816,7 +1813,7 @@ if __name__ == "__main__":
 	workbook_read = xlrd.open_workbook(os.path.join(cur_dir, workbook_read_name))
 	sheet_list = workbook_read.sheets()
 	sheet1 = sheet_list[0]
-	for i in range(86, num_stock):
+	for i in range(263, num_stock):
 		#t1 = threading.Thread(target=main, args=(sheet1.cell(i + 1, 1).value))
 		#t1.start()
 		print("number", i, sheet1.cell(i + 1, 0).value, sheet1.cell(i + 1, 1).value, sheet1.cell(i + 1, 2).value, sheet1.cell(i + 1, 3).value)
